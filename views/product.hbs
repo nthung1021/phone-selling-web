@@ -1,0 +1,46 @@
+<div class="bg-[#f0e9e0] py-8 text-center">
+    <h1 class="text-6xl text-[#8c7a6b] mt-8 mb-24">PRODUCTS</h1>
+</div>
+
+<div class="container mx-auto px-4">
+    <div class="text-lg text-[#BD8256] my-4">
+        <a href="#" class="hover:underline">HOME</a> / <a href="#" class="hover:underline">SHOP</a>
+    </div>
+    <hr class="border-gray-800 mt-8 mb-6">
+    <div class="flex justify-between items-center mb-4">
+        <div class="text-xl text-[#8c7a6b]">Showing 1-8 of 9 results</div>
+        <select class="border border-gray-600 rounded py-3 px-8 text-xl">
+            <option>Default sorting</option>
+            <option>Sort by popularity</option>
+            <option>Sort by average rating</option>
+            <option>Sort by lastest</option>
+            <option>Sort by price: low to high</option>
+            <option>Sort by price: high to low</option>
+        </select>
+    </div>
+    <!-- Card -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {{#each products}}
+            <div class="bg-white rounded-lg shadow-2xl p-4 text-center" onclick="window.location.href='/detail/{{formatName this.name}}'">
+                <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="{{this.imageUrl}}" alt="{{this.name}}">
+                <h2 class="text-xl text-[#8c7a6b] m-3  cursor-pointer">{{this.name}}</h2>
+                <p class="text-xl text-[#BD8256] mb-4 cursor-pointer">£{{this.price}}</p>
+                <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
+            </div>
+        {{/each}}
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="flex justify-center mt-12 mb-36">
+    <button class="bg-[#F7F0E8] border border-gray-300 text-gray-500 py-2 px-3 hover:bg-[#F7F0E8]">
+        1
+    </button>
+    <button class="bg-white border border-gray-300 text-gray-500 py-3 px-3 hover:bg-[#F7F0E8]">
+        2
+    </button>
+    <button class="bg-white border border-gray-300 text-gray-500 py-2 px-6 hover:bg-[#F7F0E8]">
+        <i class="fas fa-arrow-right">
+        </i>
+    </button>
+</div>

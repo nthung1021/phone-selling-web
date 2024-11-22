@@ -1,11 +1,20 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+//var { PrismaClient } = require("@prisma/client");
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var hbs = require('hbs');
+hbs.registerHelper('formatName', function(name) {
+  return name.toLowerCase().replace(/ /g, '-');
+});
+
+var indexRouter = require('./components/index/indexRoute');
+var aboutRouter = require('./components/about/aboutRoute');
+var contactRouter = require('./components/contact/contactRoute');
+var productRouter = require('./components/product/productRoute');
+var usersRouter = require('./components/users/usersRoute');
 
 var app = express();
 
@@ -15,11 +24,16 @@ app.set('view engine', 'hbs');
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/home', indexRouter);
+app.use('/about', aboutRouter);
+app.use('/contact', contactRouter);
+app.use('/product', productRouter);
+app.use('/detail', productRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
