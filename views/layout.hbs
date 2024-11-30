@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>{{title}}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    <script src="https://kit.fontawesome.com/6003be13db.js" crossorigin="anonymous"></script>
+    <script src="/javascripts/script.js"></script>
+  </head>
+  <body>
+    <header class="bg-orange-300 text-white sticky top-0 z-10">
+        <section class="max-w-7xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="text-3xl font-medium">UNDERTONE</h1>
+            <div>
+                <button id="mobile-open-button" class="text-3xl sm:hidden focus:outline-none">
+                    &#9776;
+                </button>
+                <nav class="sm:block space-x-8 text-xl" aria-label="main">
+                    <a href="/home" class="hover:opacity-90">Home</a>
+                    <a href="/about" class="hover:opacity-90">About</a>
+                    <a href="/contact" class="hover:opacity-90">Contact</a>
+                    <a href="/product" class="hover:opacity-90">Product</a>
+                    {{#if user}}
+                    <span class="text-black">{{user.username}}</span>
+                    <a href="" class="text-red-600 font-bold">Log Out</a>
+                    {{else}}                    
+                    <a href="/users/register" class="hover:opacity-90 text-black font-bold">Register</a>
+                    <a href="/users/login" class="hover:opacity-90 text-black font-bold">Login</a>                             
+                    {{/if}}
+                </nav>
+            </div>
+        </section>
+    </header>
+    {{{body}}}
+    <footer class="py-12 px-8 bg-orange-100 flex flex-row">
+        <div class="w-1/4">
+            <h1 class="text-3xl text-orange-800">UNDERTONE</h1>
+            <h2 class="text-xl">&copy;Copyright 2024</h2>
+        </div>
+        <div class="w-1/4">
+            <h1 class="text-2xl text-orange-800">Opening Hours</h1>
+            <h2 class="text-xl">Monday - Friday 8am - 5:30pm</h2>
+        </div>
+        <div class="w-1/6">
+            <h1 class="text-2xl text-orange-800">Phone</h1>
+            <h2 class="text-xl">1900 500 888</h2>
+        </div>
+        <div class="w-1/4">
+            <h1 class="text-2xl text-orange-800">Address</h1>
+            <h2 class="text-xl">227 Nguyen Van Cu, District 5, HCM City</h2>
+        </div>
+        <div class="flex justify-center">
+            <img class="size-1/4 m-1" src="/img/facebook.png" alt="facebook-link">
+            <img class="size-1/4 m-1" src="/img/twitter.png" alt="twitter-link">
+            <img class="size-1/4 m-1" src="/img/instagram.png" alt="instagram-link">
+            <img class="size-1/4 m-1" src="/img/youtube.png" alt="youtube-link">
+        </div>
+    </footer>
+    <script src="/javascripts/menu-toggle.js"></script>
+    <script src="/javascripts/form-handle.js"></script>
+    {{!-- <script src="/javascripts/fetchProduct.js"></script> --}}
+  </body>
+</html>

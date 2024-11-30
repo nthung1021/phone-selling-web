@@ -1,0 +1,137 @@
+<div class="bg-[#f0e9e0] py-8 text-center">
+    <h1 class="text-6xl text-[#8c7a6b] mt-8 mb-24">{{product.name}}</h1>
+</div>
+<div class="container mx-auto px-4 xl:px-48">
+    <div class="grid grid-cols-1 lg:grid-cols-2 py-12">
+        <div class="mr-36">
+            <div class="text-sl text-[#BD8256] mt-4 mb-12">
+                <a href="#">HOME</a> / <a href="#">ACCESSORIES</a> / <a href="#">{{product.name}}</a>
+            </div>
+            <h2 class="text-4xl text-[#826C5F] mb-8">{{product.name}}</h2>
+            <p class="text-xl text-[#8c7a6b] mb-16">
+                {{product.shortDescription}}
+            </p>
+            {{#if disPrice}}
+            <p class="text-2xl text-[#BD8256] mb-4 line-through">£{{product.price}}</p>
+            <p class="text-2xl text-red-400 mb-4">£{{disPrice}}</p>
+            {{else}}
+            <p class="text-2xl text-[#BD8256] mb-4">£{{product.price}}</p>
+            {{/if}}
+            <div class="flex items-center mt-32 mb-16">
+                <input class="w-20 p-3 border border-gray-300 bg-[#f0e9e0] mr-4 text-2xl" type="number" value="1">
+                <button
+                    class="w-80 p-3 border border-gray-300 bg-[#AC6F53] text-white text-2xl hover:bg-[#d3c0b6]">
+                    ADD TO CART
+                </button>
+            </div>
+        </div>
+        <div class="right">
+            <div class="mb-8 md:mb-0">
+                <img src="/{{product.imageUrl}}" alt={{product.name}} class="w-full border border-gray-300 rounded-xl shadow-xl">
+            </div>
+            <div class="icon">
+                <hr class="border-[#BD8256] mt-12">
+                <div class="flex justify-between mt-2 items-center">
+                    <span class="text-2xl text-[#BD8256]">Share</span>
+                    <a href="#" class="text-gray-500">
+                        <i class="fa-brands fa-facebook text-xl text-[#BD8256] hover:text-[#d3c0b6]"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-phone text-xl text-[#BD8256] hover:text-[#d3c0b6]"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-brands fa-twitter text-xl text-[#BD8256] hover:text-[#d3c0b6]"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa-solid fa-envelope text-xl text-[#BD8256] hover:text-[#d3c0b6]"></i>
+                    </a>
+                </div>
+                <hr class="border-[#BD8256] mt-2 mb-12">
+            </div>
+        </div>
+    </div>
+    <div class="border border-gray-100 shadow-lg p-8 mb-8">
+        <div class="border-b border-[#BD8256] mb-4">
+            <ul class="flex space-x-8">
+                <li class="pb-2 border-b-x border-[#BD8256] description-tab">
+                    <a href="#" class="text-xl text-[#BD8256]">Description</a>
+                </li>
+                <li class="pb-2 border-b-x border-[#BD8256] review-tab">
+                    <a href="#" class="text-xl text-[#BD8256]">Reviews (0)</a>
+                </li>
+            </ul>
+        </div>
+        <div class="description-content">
+            <h3 class="text-xl font-medium text-[#B48B7D] mb-6">DESCRIPTION</h3>
+            <p class="text-xl mb-4 text-[#7a6c5b]">
+                {{product.longDescription}}
+            </p>
+        </div>
+        <div class="reviews-content" style="display: none">
+            <h3 class="text-xl font-medium text-[#B48B7D] mb-4">REVIEWS</h3>
+            <p class="text-xl text-[#7a6c5b] mb-4">
+                There are no reviews yet. <br> 
+                Be the first to review {{product.name}} <br>
+                Your email address will not be published. Required fields are marked *
+            </p>
+            <form>
+                <div class="mb-4">
+                    <label class="block text-xl text-[#7a6c5b] mb-2">Your rating *</label>
+                    <div class="cursor-pointer" id="rating">
+                        <i class="far fa-star text-[#b48b7d] text-xl" data-value="1"></i>
+                        <i class="far fa-star text-[#b48b7d] text-xl" data-value="2"></i>
+                        <i class="far fa-star text-[#b48b7d] text-xl" data-value="3"></i>
+                        <i class="far fa-star text-[#b48b7d] text-xl" data-value="4"></i>
+                        <i class="far fa-star text-[#b48b7d] text-xl" data-value="5"></i>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xl text-[#7a6c5b] mb-2" for="review">Your review *</label>
+                    <textarea id="review" class="w-full p-2 border border-gray-300 rounded-2xl h-32"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xl text-[#7a6c5b] mb-2" for="name">Name *</label>
+                    <textarea id="name" class="w-full p-2 border border-gray-300 rounded-2xl h-12"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xl text-[#7a6c5b] mb-2" for="email">Email *</label>
+                    <textarea id="email" class="w-full p-2 border border-gray-300 rounded-2xl h-12"></textarea>
+                </div>
+                <div class="mb-6">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox text-[#b48b7d]">
+                        <span class="ml-2 text-xl text-[#7a6c5b]">
+                            Save my name, email, and website in this 
+                            browser for the next time I comment.
+                        </span>
+                    </label>
+                </div>
+                <div class="mb-4">
+                    <button class="border border-gray-300 text-xl px-6 py-1 bg-[#d3c0b6] text-white">SUBMIT</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="relevant-products">
+        <h1 class="text-4xl text-gray-500 text-center p-4">
+            OTHER PRODUCTS
+        </h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {{#each relevantProducts}}
+            <div class="bg-white rounded-lg border border-[#d3c0b6] shadow-2xl p-2 text-center" onclick="window.location.href='/detail/{{formatName this.name}}'">
+                <img class="mx-auto my-6 object-cover" src="/{{this.imageUrl}}" alt={{this.name}}>
+                <h2 class="font-playfair text-xl text-[#8c7a6b] m-3">{{this.name}}</h2>
+                {{#if this.discountedPrice}}
+                <p class="text-xl text-[#BD8256] mb-4 line-through">£{{this.price}}</p>
+                <p class="text-xl text-red-400 mb-4">£{{this.discountedPrice}}</p>
+                {{else}}
+                <p class="text-xl text-[#BD8256] mb-4">£{{this.price}}</p>
+                {{/if}}
+                <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#d3c0b6]">
+                    ADD TO CART
+                </button>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>

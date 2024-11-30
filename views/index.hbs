@@ -1,0 +1,100 @@
+<a href="/product" class="bg-green-600 text-3xl text-center p-4 font-bold text-black">
+    BIG SALES! Get 20% discount for ALL products right now! Click here to check prices.
+</a>
+
+<section class="px-20 flex flex-row bg-orange-100">
+    <div class="w-1/2 p-20 my-60">
+        <h1 class="text-5xl my-2 tracking-widest text-orange-300">UNDERTONE</h1>
+        <h2 class="text-right text-3xl font-sans">freelance your way</h2>
+        <p class="text-xl my-10">
+            This is the website where you can find out best service to change your life
+        </p>
+        <button class="w-48 text-xl rounded-full h-12 px-5 bg-orange-400 text-white">ABOUT US</button>
+    </div> 
+    <img src="img/person.png" alt="img" class="w-1/2 m-20 scale-75">
+</section>
+
+<div class="featured-products">
+    <h1 class="text-4xl text-gray-800 text-center p-4">
+        FEATURED PRODUCTS
+    </h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {{#each featuredProducts}}
+        <div class="bg-white rounded-lg border border-[#d3c0b6] shadow-2xl p-2 text-center" onclick="window.location.href='/detail/{{formatName this.name}}'">
+            <img class="mx-auto my-6 object-cover" src="/{{this.imageUrl}}" alt="{{this.name}}">
+            <h2 class="font-playfair text-xl text-[#8c7a6b] m-3">{{this.name}}</h2>
+            {{#if this.discountedPrice}}
+            <p class="text-xl text-[#BD8256] mb-4 line-through">£{{this.price}}</p>
+            <p class="text-xl text-red-400 mb-4">£{{this.discountedPrice}}</p>
+            {{else}}
+            <p class="text-xl text-[#BD8256] mb-4">£{{this.price}}</p>
+            {{/if}}
+            <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#d3c0b6]">
+                ADD TO CART
+            </button>
+        </div>
+        {{/each}}
+    </div>
+</div>
+
+<section class="mx-20 my-40 flex flex-row">
+    <img src="img/welcome.png" alt="img" class="w-1/2 m-10">
+    <div class="w-1/2 mx-10 my-20">
+        <h1 class="text-5xl my-2 tracking-widest text-orange-300">WELCOME</h1>
+        <h2 class="text-right text-3xl font-sans">lets go natural</h2>
+        <p class="text-xl my-2">
+            We provide not only some product that you can get with the best price, but you also can get more advise from us 
+            to understand more about it.
+        </p>
+    </div> 
+</section>
+<section class="mx-28 my-20 flex flex-row justify-center">
+    <div class="w-1/2 pl-20 py-40 my-20 ">
+        <h1 class="text-5xl my-2 tracking-widest text-orange-300">OH SO LOVELY</h1>
+        <h2 class="text-right text-3xl font-sans">our new service are on trend</h2>
+        <p class="text-xl my-2">
+            Our products are high-quality made and always make sure that you will use it for a long time. Also we
+            always provide new product every month to make sure you can keep up with the trend
+        </p>
+    </div> 
+    <img src="img/oh.png" alt="img1" class="w-1/2 m-10">
+</section>
+<section class="my-40">
+    <h1 class="text-5xl text-center text-orange-300">LATEST</h1>
+    <h2 class="text-3xl text-center font-sans">from the blog</h2>
+    <div class="flex flex-row m-10">
+        <div class="w-1/3 m-5 p-5 bg-orange-100 rounded-2xl">
+            <img src="img/l1.png" alt="img" class="my-3">
+            <h3 class="text-2xl text-center my-3 text-orange-800">PERFECT YOUT HOME OFFICE</h3>
+            <p class="text-xl my-3">
+                Learn how to decorate your office with the latest fashion and model
+            </p>
+            <div class="text-center"><a href="" class="text-xl my-3 text-orange-800 font-bold">READ MORE >></a></div>
+        </div>
+        <div class="w-1/3 m-5 p-5 bg-orange-100 rounded-2xl">
+            <img src="img/l2.png" alt="img" class="my-3">
+            <h3 class="text-2xl text-center my-3 text-orange-800">ILLUSTARTORS AND AUTHORS THRIVING</h3>
+            <p class="text-xl my-3">
+                Know more about pictures and authors that they made
+            </p>
+            <div class="text-center"><a href="" class="text-xl my-3 text-orange-800 font-bold">READ MORE >></a></div>
+        </div>
+        <div class="w-1/3 m-5 p-5 bg-orange-100 rounded-2xl">
+            <img src="img/l3.png" alt="img" class="my-3">
+            <h3 class="text-2xl text-center my-3 text-orange-800">SUCCULENT SUCCESS</h3>
+            <p class="text-xl my-3">
+                When the success not only comes from the effort...
+            </p>
+            <div class="text-center"><a href="" class="text-xl my-3 text-orange-800 font-bold">READ MORE >></a></div>
+        </div>
+    </div>
+</section>
+<section class="my-20 mx-8 flex flex-row bg-orange-100 rounded-2xl">
+    <div class="w-5/12 p-5">
+        <h1 class="text-3xl">Join our newsletter</h1>
+        <p class="text-xl">Always know and receive to the latest service</p>
+    </div>
+    <input class="w-1/6 text-xl bg-white rounded-full h-10 my-10 px-5 mx-2" placeholder="Name">
+    <input class="w-1/4 text-xl bg-white rounded-full h-10 my-10 px-5 mx-2" placeholder="Email">
+    <button class="w-1/12 text-xl rounded-full h-10 my-10 px-5 bg-orange-400 text-white mx-2">Join</button>
+</section>
