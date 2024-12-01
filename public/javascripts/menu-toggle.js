@@ -57,5 +57,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Đảo ngược trạng thái hiển thị menu
         isMenuVisible = !isMenuVisible;
-    });
+
+        // Cuộn trang xuống một khoảng sau khi click vào icon
+        smoothScroll(240);
+    });         
+
+    function smoothScroll(targetPosition) {
+        const startPosition = window.pageYOffset;
+        const distance = targetPosition - startPosition;
+        const duration = 500; // Thời gian cuộn (ms)
+        let startTime;
+
+        function scrollStep(currentTime) {
+            if (!startTime) startTime = currentTime;
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+            window.scrollTo(0, startPosition + distance * ease);
+
+            if (progress < 1) {
+                requestAnimationFrame(scrollStep);
+            }
+        }
+
+        requestAnimationFrame(scrollStep);
+    }
 });

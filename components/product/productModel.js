@@ -35,25 +35,60 @@ var getRelevantProducts = async (category, excludeProductId, limit = 4) => {
 const findFilteredProducts = async (filters) => {
     try {
         const whereConditions = {}; // Xây dựng điều kiện lọc
-
+  
         if (filters.price && Array.isArray(filters.price)) {
             const priceConditions = filters.price.map(p => {
                 const range = p.split('-');
-                return range.length === 1
-                    ? { price: { lt: parseFloat(range[0]) } }
-                    : { price: { gte: parseFloat(range[0]), lte: parseFloat(range[1]) } };
+                if (range.length === 1) {
+                    if (p.startsWith('>')) {
+                        return { price: { gt: parseFloat(p.slice(1)) } };
+                    } else if (p.startsWith('<')) { // Xử lý trường hợp "<20"
+                        return { price: { lt: parseFloat(p.slice(1)) } };
+                    }
+                } else {
+                    return { price: { gte: parseFloat(range[0]), lte: parseFloat(range[1]) } };
+                }
             });
             whereConditions.OR = priceConditions;
-        }
-
+        }        
+      
         if (filters.gender && filters.gender.length > 0) {
             whereConditions.gender = { in: filters.gender };
         }
-
+  
         if (filters.kind && filters.kind.length > 0) {
-            whereConditions.kind = { in: filters.kind };
-        }
-
+          const childMapping = {
+              tops: ["Shirt", "T-shirt", "Coat", "Sweater", "Cardigan"],
+              bottoms: ["Trousers", "Dress", "Skirt", "Jeans", "Pants", "Shorts"],
+              shoes: ["Sandals", "Sneakers", "High heels", "Slip-ons", "Slippers", "Flip-flops", "Boots", "Ballet flats", "Crocs"],
+              accessories: ["Hat", "Belt", "Socks", "Scarf", "Glove", "Sunglasses", "Wallet", "Purse"]
+          };
+      
+          // Lấy tất cả các giá trị con được chọn
+          const selectedChildren = filters.kind.filter(kind =>
+              Object.values(childMapping).flat().includes(kind)
+          );
+      
+          // Loại bỏ cha nếu con tương ứng đã được chọn
+          const filteredKinds = filters.kind.filter(kind => {
+              if (childMapping[kind]) {
+                  // Loại bỏ cha nếu có ít nhất một giá trị con được chọn
+                  return !selectedChildren.some(child => childMapping[kind].includes(child));
+              }
+              return true; 
+          });
+      
+          const kindConditions = filteredKinds.flatMap(kind => {
+              if (childMapping[kind]) {
+                  return childMapping[kind].map(child => ({ kind: child }));
+              } else {
+                  return { kind: kind };
+              }
+          });
+      
+          whereConditions.OR = kindConditions;
+      }    
+      
         if (filters.material && filters.material.length > 0) {
             whereConditions.material = { in: filters.material };
         }

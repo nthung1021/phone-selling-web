@@ -35,19 +35,24 @@ document.getElementById('form').addEventListener('submit', async (event) => {
 // Function to display products
 function displayProducts(products) {
     const productContainer = document.getElementById('product-list');
-    productContainer.innerHTML = ''; // Xóa danh sách hiện tại trước khi hiển thị lại
+    productContainer.innerHTML = '';        
 
     products.forEach(product => {
         const productElement = document.createElement('div');
         productElement.className = 'bg-white rounded-lg shadow-2xl p-4 text-center';
+        productElement.onclick = () => window.location.href = `/detail/${formatName(product.name)}`;
 
         productElement.innerHTML = `
-            <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="${product.imageUrl}" alt="${product.name}">
+            <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="${product.imageUrl}" alt="${product.name}" >
             <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">${product.name}</h2>
             <p class="text-xl text-[#BD8256] mb-4 cursor-pointer">£${product.price}</p>
             <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
         `;
 
-        productContainer.appendChild(productElement); // Thêm sản phẩm vào container
+        productContainer.appendChild(productElement);
     });
+}
+
+function formatName(name) {
+    return name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 }
