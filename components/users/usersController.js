@@ -60,4 +60,33 @@ var postRegister = async (req, res) => {
     }
 };
 
-module.exports = { getLogin, postLogin, getRegister, postRegister };
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+        // Create an error object to pass to the view
+        const error = {
+            status: 401,
+            message: 'Unauthorized access. Please log in to continue.',
+            stack: (new Error()).stack // Optional: include stack trace if needed
+        };
+
+        // Render the error page and pass the error object
+        res.status(401).render('error', { error });
+    }
+}
+
+const getInfo = (req, res) => {
+    res.render('info', { title: 'GA05 - Information'});
+}
+
+const getLogout = async (req, res, next) => {
+    req.logout(err => {
+        if (err) {
+            return next(err); 
+        }
+        res.redirect('/'); // Chuyển về home
+    });
+};
+
+module.exports = { getLogin, postLogin, getRegister, postRegister, getInfo, getLogout, ensureAuthenticated };

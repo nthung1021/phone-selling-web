@@ -22,8 +22,8 @@
                     <a href="/contact" class="hover:opacity-90">Contact</a>
                     <a href="/product" class="hover:opacity-90">Product</a>
                     {{#if user}}
-                    <span class="text-black">{{user.username}}</span>
-                    <a href="" class="text-red-600 font-bold">Log Out</a>
+                    <a href="/users/info" class="text-black">{{user.username}}</a>
+                    <a href="/users/logout" class="text-red-600 font-bold">Log Out</a>
                     {{else}}                    
                     <a href="/users/register" class="hover:opacity-90 text-black font-bold">Register</a>
                     <a href="/users/login" class="hover:opacity-90 text-black font-bold">Login</a>                             
