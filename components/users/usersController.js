@@ -6,32 +6,25 @@ var getLogin = (req, res) => {
     res.render('login', { title: 'GA05 - Log in' });
 };
 
-// var postLogin = async (req, res) => {
-//   var { username, password } = req.body;
-
-//   try {
-//     var user = await findUserByUsername(username);
-//     if (!user) {
-//       return res.render('login', { error: 'Invalid username or password', title: 'Login' });
-//     }
-
-//     var isMatch = await bcrypt.compare(password, user.password);
-//     if (!isMatch) {
-//       return res.render('login', { error: 'Invalid username or password', title: 'Login' });
-//     }
-
-//     res.redirect('/');
-//   } catch (error) {
-//     console.error(error);
-//     res.render('login', { error: 'Something went wrong!', title: 'Login' });
-//   }
-// };
-
-var postLogin = passport.authenticate('local', {
-    successRedirect: '/',
-    failureRedirect: '/login',
-    failureFlash: true // Ensure flash middleware is added to show messages
-});
+var postLogin = (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) {
+        console.error(err);
+        return res.render('login', { error: 'An unexpected error occurred. Please try again.', title: 'Login' });
+      }
+      if (!user) {
+        // `info.message` contains the error message set in `passportConfig.js`
+        return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error(err);
+          return res.render('login', { error: 'Failed to log in. Please try again.', title: 'Login' });
+        }
+        return res.redirect('/');
+      });
+    })(req, res, next);
+  };
 
 var getRegister = (req, res) => {
     res.render('register', { title: 'GA05 - Register' });
