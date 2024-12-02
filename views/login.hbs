@@ -4,7 +4,7 @@
 
 <form action="/users/login" method="POST">
     <div class="flex flex-col items-center justify-center my-20 mx-120 bg-orange-100">
-        <input type="text" name="username" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="Userame" required>
+        <input type="text" name="username" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="Username" id="username" value="{{username}}" required>
         <input type="password" name="password" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="Password" required>
         {{#if error}}
         <div class="error-message text-xl text-center p-1 mb-4 text-red-700 font-bold">
