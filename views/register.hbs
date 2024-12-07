@@ -2,15 +2,107 @@
     <h1 class="text-6xl text-[#8c7a6b] mt-8 mb-24">REGISTER</h1>
 </div>
 
-<form action="/users/register" method="POST">
+<form id="form" action="/users/register" method="POST">
     <div class="flex flex-col items-center justify-center my-16 mx-120 bg-orange-100">
-        <input type="text" name="username" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="New Username" required>
-        <input type="password" name="password" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="New Password" required>
-        {{#if error}}
-        <div class="error-message text-xl text-center p-1 mb-4 text-red-700 font-bold">
-            <p>{{error}}</p>
+        <div class="relative w-64">
+            <input type="text" name="username" class="w-full h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="New Username" required>
+            <div class="error-message-username text-red-700 text-sm mt-1"></div>
+        </div>
+        <div class="relative w-64">
+            <input type="text" name="email" class="w-full h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="New Email" required>
+            <div class="error-message-email text-red-700 text-sm mt-1"></div>
+        </div>
+        <div class="relative w-64">
+            <input type="password" name="password" class="w-64 h-12 rounded-lg border-2 border-orange-400 m-2 px-2" placeholder="New Password" required>
+        </div>
+        <div id="form-error" class="text-red-700 text-sm mt-4"></div>
+        <button type="submit" class="w-40 h-12 rounded-lg bg-orange-700 m-2 text-xl">Register</button>
+        {{#if success}}
+        <div class="text-green-700 text-sm mt-4">
+            <p>{{success}}</p>
         </div>
         {{/if}}
-        <button type="summit" class="w-40 h-12 rounded-lg bg-orange-700 m-2 text-xl">Register</button>
     </div>
 </form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const usernameInput = document.querySelector('input[name="username"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    const form = document.getElementById('form');
+    const formErrorDiv = document.getElementById('form-error');
+
+    function checkAvailability(input, fieldName) {
+        const value = input.value.trim();
+        const errorDiv = document.querySelector(`.error-message-${fieldName}`);
+        if (value) {
+            fetch(`/users/check-availability?${fieldName}=${encodeURIComponent(value)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        input.classList.add('border-red-500');
+                        errorDiv.textContent = `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is already exists`;
+                    } else {
+                        input.classList.remove('border-red-500');
+                        errorDiv.textContent = ''; // Clear the error message
+                    }
+                })
+                .catch(err => {
+                    console.error('Error checking availability:', err);
+                });
+        } else {
+            input.classList.remove('border-red-500');
+            errorDiv.textContent = ''; // Clear the error message
+        }
+    }
+
+    // Add event listener to clear error when user types
+    usernameInput.addEventListener('input', () => {
+        const errorDiv = document.querySelector('.error-message-username');
+        if (errorDiv) {
+            errorDiv.textContent = ''; // Clear the error message while typing
+            usernameInput.classList.remove('border-red-500');
+        }
+    });
+
+    emailInput.addEventListener('input', () => {
+        const errorDiv = document.querySelector('.error-message-email');
+        if (errorDiv) {
+            errorDiv.textContent = ''; // Clear the error message while typing
+            emailInput.classList.remove('border-red-500');
+        }
+    });
+
+    usernameInput.addEventListener('blur', () => {
+        checkAvailability(usernameInput, 'username');
+    });
+    
+    emailInput.addEventListener('blur', () => {
+        checkAvailability(emailInput, 'email');
+    });
+
+    // Clear form or show an alert if there are errors
+    form.addEventListener('submit', (e) => {
+        e.preventDefault(); // Prevent form from submitting normally
+
+        // Check if there are any error messages displayed
+        const errorMessages = document.querySelectorAll('.error-message-username, .error-message-email');
+        let hasError = false;
+
+        errorMessages.forEach((errorDiv) => {
+            if (errorDiv.textContent.trim() !== '') {
+                hasError = true;
+            }
+        });
+
+        if (hasError) {
+             formErrorDiv.textContent = ('Something went wrong');
+            return; // Prevent form submission
+        }
+
+        formErrorDiv.textContent = '';
+        form.submit();
+    });
+});
+</script>
+

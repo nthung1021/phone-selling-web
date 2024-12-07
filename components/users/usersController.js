@@ -1,6 +1,6 @@
 var bcrypt = require('bcrypt');
 var passport = require('./passportConfig');
-var { findUserByUsername, createUser } = require('./usersModel');
+var { findUserByUsername, createUser, findUserByEmail } = require('./usersModel');
 
 var getLogin = (req, res) => {
     res.render('login', { title: 'GA05 - Log in' });
@@ -31,22 +31,29 @@ var getRegister = (req, res) => {
 };
 
 var postRegister = async (req, res) => {
-    var { username, password } = req.body;
+    var { username, email, password } = req.body;
   
-    if (!username || !password) {
+    if (!username || !password || !email) {
         return res.render('register', { error: 'All fields are required', title: 'Register' });
   }
 
     try {
         var existingUser = await findUserByUsername(username);
+        var existingEmail = await findUserByEmail(email);
         if (existingUser) {
             return res.render('register', { error: 'Username already exists', title: 'Register' });
         }
+        if (existingEmail) {
+            return res.render('register', { error: 'Email already exists', title: 'Register' });
+        }
 
         var hashedPassword = await bcrypt.hash(password, 10);
-        await createUser(username, hashedPassword);
+        await createUser(username, email, hashedPassword);
 
-        res.redirect('/home');
+        res.render('register', {
+          success: 'Registration successful! Please log in.',
+          title: 'Register'
+        });
       } catch (error) {
         console.error(error);
         res.render('register', { error: 'Something went wrong!', title: 'Register' });
@@ -82,4 +89,27 @@ const getLogout = async (req, res, next) => {
     });
 };
 
-module.exports = { getLogin, postLogin, getRegister, postRegister, getInfo, getLogout, ensureAuthenticated };
+const checkAvailability = async (req, res) => {
+  const { username, email } = req.query;
+
+  try {
+    if (username) {
+      const user = await findUserByUsername(username);
+      const userExists = user !== null; // Kiểm tra nếu user là null
+      return res.json({ exists: userExists });
+    }
+
+    if (email) {
+      const user = await findUserByEmail(email);
+      const emailExists = user !== null; // Kiểm tra nếu user là null
+      return res.json({ exists: emailExists });
+    }
+
+    res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { getLogin, postLogin, getRegister, postRegister, getInfo, getLogout, ensureAuthenticated, checkAvailability };

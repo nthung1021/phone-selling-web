@@ -9,10 +9,18 @@ var findUserByUsername = async (username) => {
     return prisma.user.findUnique({ where: { username } });
 };
 
-var createUser = async (username, hashedPassword) => {
+var findUserByEmail = async (email) => {
+    if (!email) {
+        throw new Error('Email is required');
+      }
+  
+    return prisma.user.findUnique({ where: { email } });
+};
+
+var createUser = async (username, email, hashedPassword) => {
     return prisma.user.create({
-        data: { username, password: hashedPassword },
+        data: { username: username, email: email, password: hashedPassword },
     });
 };
 
-module.exports = { findUserByUsername, createUser };
+module.exports = { findUserByUsername, createUser, findUserByEmail };
