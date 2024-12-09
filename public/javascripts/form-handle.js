@@ -1,4 +1,7 @@
-document.getElementById('form').addEventListener('submit', async (event) => {
+document.getElementById('form').addEventListener('submit', handleFormSubmit);
+document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
+
+async function handleFormSubmit(event) {
     event.preventDefault();
 
     // Collect selected filters
@@ -12,13 +15,16 @@ document.getElementById('form').addEventListener('submit', async (event) => {
         selectedFilters[filterType].push(value);
     });
 
-    console.log('Selected Filters:', selectedFilters);
+    //console.log('Selected Filters:', selectedFilters);
+    const searchQuery = document.getElementById('search-input').value || '';
+    const excludeProductId = null; // Set this if you need to exclude a specific product
+    const limit = 4; // Set the limit as needed
 
     try {
-        const response = await fetch('/product/get-products', {
+        const response = await fetch(`/product/search-filter?q=${encodeURIComponent(searchQuery)}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(selectedFilters),
+            body: JSON.stringify({ filters: selectedFilters, excludeProductId, limit }),
         });
 
         if (response.ok) {
@@ -30,12 +36,12 @@ document.getElementById('form').addEventListener('submit', async (event) => {
     } catch (error) {
         console.error('Error fetching products:', error);
     }
-});
+};
 
 // Function to display products
 function displayProducts(products) {
     const productContainer = document.getElementById('product-list');
-    productContainer.innerHTML = '';        
+    productContainer.innerHTML = '';
 
     products.forEach(product => {
         const productElement = document.createElement('div');

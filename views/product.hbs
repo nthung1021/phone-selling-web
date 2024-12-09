@@ -10,13 +10,16 @@
             <a href="#" class="hover:underline">HOME</a> / <a href="#" class="hover:underline">SHOP</a>
         </div>
 
-        <form action="/product" method="get">
-            <input class= "text-lg text-gray-500 font-medium border-2 border-gray-300 px-4 py-2" type="text" name="q" value="{{query}}" placeholder="Search products..." required>
-            <button class= "text-lg text-black font-bold font-medium border-2 border-black px-4 py-2 bg-gray-400" type="submit">Search</button>
+        <form id="search-form" action="/product/search-filter" method="POST">
+            <input id="search-input" class="text-lg text-gray-500 font-medium border-2 border-gray-300 px-4 py-2"
+                type="text" name="q" value="{{query}}" placeholder="Search products..." required>
+            <button class="text-lg text-black font-bold font-medium border-2 border-black px-4 py-2 bg-gray-400"
+                type="submit">Search</button>
         </form>
 
-        <form method="POST" action="/product/get-products" id="form">
-            <ul id="ct-top-menu" class="flex gap-8 uppercase text-lg text-gray-500 font-medium relative border-2 border-gray-300 rounded-lg backdrop-blur-lg shadow-xl px-4 py-2">
+        <form method="POST" action="/product/search-filter" id="form">
+            <ul id="ct-top-menu"
+                class="flex gap-8 uppercase text-lg text-gray-500 font-medium relative border-2 border-gray-300 rounded-lg backdrop-blur-lg shadow-xl px-4 py-2">
                 <div class="item-center" id="search-icon">
                     <i class="fa-solid fa-magnifying-glass cursor-pointer"></i>
                 </div>
@@ -24,20 +27,28 @@
                 <li class="ct-top-menu-item">
                     <a href="#" class="hover:text-black">Price</a>
                     <ul class="checkbox-list hidden bg-white border border-gray-300 rounded-lg shadow-md mt-2 p-4">
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="price" data-value="<20"/> &#60; 20</label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="price" data-value="20-50"/> 20-50</label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="price" data-value="50-80"/> 50-80</label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="price" data-value="80-100"/> 80-100</label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="price" data-value=">100"/> &#62; 100</label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="price" data-value="<20" /> &#60; 20</label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="price" data-value="20-50" /> 20-50</label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="price" data-value="50-80" /> 50-80</label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="price" data-value="80-100" /> 80-100</label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="price" data-value=">100" /> &#62; 100</label></li>
                     </ul>
                 </li>
                 <!-- Gender filter -->
                 <li class="ct-top-menu-item">
                     <a href="#" class="hover:text-black">Gender</a>
                     <ul class="checkbox-list hidden bg-white border border-gray-300 rounded-lg shadow-md mt-2 p-4">
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="gender" data-value="Male"/> Male </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="gender" data-value="Female"/> Female </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="gender" data-value="Unisex"/> Unisex </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="gender" data-value="Male" /> Male </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="gender" data-value="Female" /> Female </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="gender" data-value="Unisex" /> Unisex </label></li>
                     </ul>
                 </li>
                 <!-- Kind filter -->
@@ -49,51 +60,114 @@
                             kind" data-value="Featured" /> Featured</label>
                         </li>
                         <li class="group relative border-b border-gray-300 rounded-lg px-2">
-                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind" data-value="tops" /> Tops</label>
-                            <ul class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Shirt" /> Shirt</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="T-shirt" /> T-shirt</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Coat" /> Coat</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Sweater"/> Sweater</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Cardigan" /> Cardigan</label></li>
+                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind"
+                                    data-value="tops" /> Tops</label>
+                            <ul
+                                class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Shirt" /> Shirt</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="T-shirt" />
+                                        T-shirt</label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Coat" /> Coat</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Sweater" />
+                                        Sweater</label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Cardigan" />
+                                        Cardigan</label></li>
                             </ul>
                         </li>
                         <li class="group relative border-b border-gray-300 rounded-lg px-2">
-                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind" data-value="bottoms" /> Bottoms</label>
-                            <ul class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Trousers" /> Trousers</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Dress" /> Dress</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Skirt" /> Skirt</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Jeans" /> Jeans</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Pants" /> Pants</label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Shorts" /> Shorts</label></li>
+                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind"
+                                    data-value="bottoms" /> Bottoms</label>
+                            <ul
+                                class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Trousers" />
+                                        Trousers</label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Dress" /> Dress</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Skirt" /> Skirt</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Jeans" /> Jeans</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Pants" /> Pants</label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Shorts" /> Shorts</label>
+                                </li>
                             </ul>
                         </li>
                         <li class="group relative border-b border-gray-300 rounded-lg px-2">
-                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind" data-value="shoes" /> Shoes </label>
-                            <ul class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Sandals"/> Sandals </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Sneakers"/> Sneakers </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="High heels"/> High heels </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Slip-ons"/> Slip-ons </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Slippers"/> Slippers </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Flip-flops"/> Flip-flops </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Boots"/> Boots </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Ballet flats"/> Ballet flats </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Crocs"/> Crocs </label></li>
+                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind"
+                                    data-value="shoes" /> Shoes </label>
+                            <ul
+                                class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Sandals" /> Sandals
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Sneakers" /> Sneakers
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="High heels" /> High heels
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Slip-ons" /> Slip-ons
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Slippers" /> Slippers
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Flip-flops" /> Flip-flops
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Boots" /> Boots </label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Ballet flats" /> Ballet
+                                        flats </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Crocs" /> Crocs </label>
+                                </li>
                             </ul>
                         </li>
                         <li class="group relative border-b border-gray-300 rounded-lg px-2">
-                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind" data-value="accessories" /> Accessories </label>
-                            <ul class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Hat"/> Hat </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Belt"/> Belt </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Socks"/> Socks </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Scarf"/> Scarf </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Glove"/> Glove </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Sunglasses"/> Sunglasses </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Wallet"/> Wallet </label></li>
-                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter mr-2" data-filter="kind" data-value="Purse"/> Purse </label></li>
+                            <label><input type="checkbox" class="filter mr-2 cursor-pointer" data-filter="kind"
+                                    data-value="accessories" /> Accessories </label>
+                            <ul
+                                class="absolute left-full top-0 hidden group-hover:block bg-white border border-gray-300 shadow-lg p-4 space-y-2 w-48">
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Hat" /> Hat </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Belt" /> Belt </label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Socks" /> Socks </label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Scarf" /> Scarf </label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Glove" /> Glove </label>
+                                </li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Sunglasses" /> Sunglasses
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Wallet" /> Wallet
+                                    </label></li>
+                                <li class="border-b border-gray-300 px-2"><label><input type="checkbox"
+                                            class="filter mr-2" data-filter="kind" data-value="Purse" /> Purse </label>
+                                </li>
                             </ul>
                         </li>
                     </ul>
@@ -101,19 +175,29 @@
                 <!-- Material filter -->
                 <li class="ct-top-menu-item">
                     <a href="#" class="hover:text-black">Material</a>
-                    <ul class="checkbox-list bg-white border border-gray-300 rounded-lg shadow-md mt-2 p-4 grid grid-cols-2 gap-x-4 hidden">
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Cotton"/> Cotton </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Nylon"/> Nylon </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Chiffon"/> Chiffon </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Leather"/> Leather </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Linen"/> Linen </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Polar Fleece"/> Polar Fleece </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Tussar Silk"/> Tussar Silk </label></li>
-                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter" data-filter="material" data-value="Velvet"/> Velvet </label></li>
+                    <ul
+                        class="checkbox-list bg-white border border-gray-300 rounded-lg shadow-md mt-2 p-4 grid grid-cols-2 gap-x-4 hidden">
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Cotton" /> Cotton </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Nylon" /> Nylon </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Chiffon" /> Chiffon </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Leather" /> Leather </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Linen" /> Linen </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Polar Fleece" /> Polar Fleece </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Tussar Silk" /> Tussar Silk </label></li>
+                        <li class="border-b border-gray-300 px-2"><label><input type="checkbox" class="filter"
+                                    data-filter="material" data-value="Velvet" /> Velvet </label></li>
                     </ul>
                 </li>
             </ul>
-            <button type="submit" id="apply-filters" class="mt-4 p-2 bg-blue-500 border text-black rounded">Apply Filters</button>
+            <button type="submit" id="apply-filters" class="mt-4 p-2 bg-blue-500 border text-black rounded">Apply
+                Filters</button>
         </form>
     </div>
 
@@ -136,30 +220,35 @@
     <div id="product-container">
         <div id="product-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
             {{#each products}}
-                <div class="bg-white rounded-lg shadow-2xl p-4 text-center" onclick="window.location.href='/detail/{{formatName this.name}}'">
-                    <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="{{this.imageUrl}}" alt="{{this.name}}">
-                    <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">{{this.name}}</h2>
-                    {{#if this.discountedPrice}}
-                    <p class="text-xl text-[#BD8256] mb-4 line-through">£{{this.price}}</p>
-                    <p class="text-xl text-red-400 mb-4">£{{this.discountedPrice}}</p>
-                    {{else}}
-                    <p class="text-xl text-[#BD8256] mb-4">£{{this.price}}</p>
-                    {{/if}}
-                    <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
-                </div>
+            <div class="bg-white rounded-lg shadow-2xl p-4 text-center"
+                onclick="window.location.href='/detail/{{formatName this.name}}'">
+                <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="{{this.imageUrl}}"
+                    alt="{{this.name}}">
+                <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">{{this.name}}</h2>
+                {{#if this.discountedPrice}}
+                <p class="text-xl text-[#BD8256] mb-4 line-through">£{{this.price}}</p>
+                <p class="text-xl text-red-400 mb-4">£{{this.discountedPrice}}</p>
+                {{else}}
+                <p class="text-xl text-[#BD8256] mb-4">£{{this.price}}</p>
+                {{/if}}
+                <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
+            </div>
             {{/each}}
         </div>
 
         <!-- Pagination -->
         <div id="pagination" class="flex justify-center space-x-2 mt-8">
             {{#each (range 1 totalPages)}}
-                <button class="pagination-btn {{#if (eq this ../currentPage)}}bg-[#AC6F53] text-white{{else}}bg-gray-200{{/if}} px-4 py-2 rounded"
-                    data-page="{{this}}">
-                    {{this}}
-                </button>
+            <button
+                class="pagination-btn {{#if (eq this ../currentPage)}}bg-[#AC6F53] text-white{{else}}bg-gray-200{{/if}} px-4 py-2 rounded"
+                data-page="{{this}}">
+                {{this}}
+            </button>
             {{/each}}
         </div>
     </div>
 
     <script src="/javascripts/product-paging.js"></script>
+    <script src="/javascripts/form-handle.js"></script>
+    <script src="/javascripts/menu-toggle.js"></script>
 </div>

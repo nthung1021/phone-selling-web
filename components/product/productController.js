@@ -1,4 +1,4 @@
-var { getAllProducts, getDescriptionByProductName, getRelevantProducts, findFilteredProducts, findProductsBySearchQuery } = require('./productModel');
+var { getAllProducts, getDescriptionByProductName, getRelevantProducts, findProducts, findProductsBySearchQuery } = require('./productModel');
 
 const LIMIT = 4 // products in 1 page
 
@@ -7,15 +7,7 @@ var getProduct = async (req, res) => {
         const query = req.query.q || ''; // Get search keyword from query string
         const page = parseInt(req.query.page || '1') // get page  
 
-        let data;
-
-        if (query) {
-            // If any search keyword found, find product based on query
-            data = await findProductsBySearchQuery(query, page, LIMIT);
-        } else {
-            // If no search keyword found, get all products
-            data = await getAllProducts(page, LIMIT);
-        }
+        let data = await getAllProducts(page, LIMIT);
 
         let { products, currentPage, totalProducts, totalPages } = data // lấy dữ liệu từ data
 
@@ -27,14 +19,14 @@ var getProduct = async (req, res) => {
                 : null,
         }));
 
-        res.render('product', { 
+        res.render('product', {
             products,
             query,
             title: 'GA05 - Products',
             currentPage,
             totalProducts,
             totalPages
-         });
+        });
     } catch (err) {
         console.error("Error in getProduct:", err);
         res.status(500).send("Error retrieving products");
@@ -45,22 +37,22 @@ var showProductDetails = async (req, res) => {
     try {
         var productName = req.params.name.replace(/-/g, " ").toUpperCase();
         var product = await getDescriptionByProductName(productName);
-        
+
         if (!product) {
             return res.status(400).render("error", { message: "Product not found" });
         }
 
         var disPrice = product.promotion
-        ? (product.price * (1 - product.promotion / 100)).toFixed(2)
-        : null;
+            ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+            : null;
 
         var relevantProducts = await getRelevantProducts(product.category, product.id);
 
         relevantProducts = relevantProducts.map(product => ({
             ...product,
             discountedPrice: product.promotion
-            ? (product.price * (1 - product.promotion / 100)).toFixed(2)
-            : null,
+                ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+                : null,
         }));
 
         res.render('product-detail', { product, disPrice, relevantProducts });
@@ -71,14 +63,32 @@ var showProductDetails = async (req, res) => {
 };
 
 const searchFilter = async (req, res) => {
-    const filters = req.body;
-
     try {
-        const products = await findFilteredProducts(filters);
-        res.json(products);
-    } catch (error) {
-        console.error('Error fetching filtered products:', error);
-        res.status(500).json({ error: 'Server error while fetching products' });
+        const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const filters = req.body.filters || {}; // Get filters from request body
+        const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
+        const limit = req.body.limit || 4; // Get limit from request body
+
+        // console.log("searchQuery:", searchQuery);
+        // console.log("filters:", filters);
+        // console.log("excludeProductId:", excludeProductId);
+        // console.log("limit:", limit);
+
+        // Find products based on search query and filters
+        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
+
+        // Calculate discounted price (if any)
+        const productsWithDiscount = products.map(product => ({
+            ...product,
+            discountedPrice: product.promotion
+                ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+                : null,
+        }));
+
+        res.json(productsWithDiscount);
+    } catch (err) {
+        console.error("Error in getProductJson:", err);
+        res.status(500).send("Error retrieving products");
     }
 };
 
