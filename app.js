@@ -23,6 +23,20 @@ var usersRouter = require('./components/users/usersRoute');
 
 var app = express();
 
+// Định nghĩa helper range trong productRouter
+hbs.registerHelper('range', function (start, end) {
+    let result = [];
+    for (let i = start; i <= end; i++) {
+        result.push(i);
+    }
+    return result;
+});
+
+// Đăng ký helper "eq"
+hbs.registerHelper('eq', function (a, b) {
+    return a === b;
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');

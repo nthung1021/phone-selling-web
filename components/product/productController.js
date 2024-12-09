@@ -1,56 +1,42 @@
-var { getDescriptionByProductName, getRelevantProducts, findProducts } = require('./productModel');
+var { getAllProducts, getDescriptionByProductName, getRelevantProducts, findFilteredProducts, findProductsBySearchQuery } = require('./productModel');
+
+const LIMIT = 4 // products in 1 page
 
 var getProduct = async (req, res) => {
     try {
-        const searchQuery = req.query.q || ''; // Get search keyword from query string
-        const filters = {}; // You can add logic to extract filters from req.query if needed
-        const excludeProductId = null; // No product to exclude in this context
-        const limit = 10; // Default limit
+        const query = req.query.q || ''; // Get search keyword from query string
+        const page = parseInt(req.query.page || '1') // get page  
 
-        // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
+        let data;
+
+        if (query) {
+            // If any search keyword found, find product based on query
+            data = await findProductsBySearchQuery(query, page, LIMIT);
+        } else {
+            // If no search keyword found, get all products
+            data = await getAllProducts(page, LIMIT);
+        }
+
+        let { products, currentPage, totalProducts, totalPages } = data // lấy dữ liệu từ data
 
         // Calculate discounted price (if any)
-        const productsWithDiscount = products.map(product => ({
+        products = products.map(product => ({
             ...product,
             discountedPrice: product.promotion
                 ? (product.price * (1 - product.promotion / 100)).toFixed(2)
                 : null,
         }));
 
-        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
+        res.render('product', { 
+            products,
+            query,
+            title: 'GA05 - Products',
+            currentPage,
+            totalProducts,
+            totalPages
+         });
     } catch (err) {
         console.error("Error in getProduct:", err);
-        res.status(500).send("Error retrieving products");
-    }
-};
-
-var searchFilter = async (req, res) => {
-    try {
-        const searchQuery = req.query.q || ''; // Get search keyword from query string
-        const filters = req.body.filters || {}; // Get filters from request body
-        const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
-        const limit = req.body.limit || 10; // Get limit from request body
-
-        // console.log("searchQuery:", searchQuery);
-        // console.log("filters:", filters);
-        // console.log("excludeProductId:", excludeProductId);
-        // console.log("limit:", limit);
-
-        // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
-
-        // Calculate discounted price (if any)
-        const productsWithDiscount = products.map(product => ({
-            ...product,
-            discountedPrice: product.promotion
-                ? (product.price * (1 - product.promotion / 100)).toFixed(2)
-                : null,
-        }));
-
-        res.json(productsWithDiscount);
-    } catch (err) {
-        console.error("Error in getProductJson:", err);
         res.status(500).send("Error retrieving products");
     }
 };
@@ -81,6 +67,18 @@ var showProductDetails = async (req, res) => {
     } catch (error) {
         console.error("Error in showProductDetails:", error);
         res.status(500).send("Internal Server Error");
+    }
+};
+
+const searchFilter = async (req, res) => {
+    const filters = req.body;
+
+    try {
+        const products = await findFilteredProducts(filters);
+        res.json(products);
+    } catch (error) {
+        console.error('Error fetching filtered products:', error);
+        res.status(500).json({ error: 'Server error while fetching products' });
     }
 };
 
