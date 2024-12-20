@@ -4,14 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "nodemon ./bin/www",
-    "start": "node ./bin/www",
+    "start": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css && node ./bin/www",
     "postinstall": "npx prisma generate",
-    "tailwind:css": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css",
+    "tailwind": "postcss public/stylesheets/tailwind.css -o public/stylesheets/style.css",
     "db": "npx prisma studio",
     "updateDB": "npx prisma db push"
   },
   "dependencies": {
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "^6.1.0",
+    "@splidejs/splide": "^4.1.4",
+    "alpinejs": "^3.14.7",
     "autoprefixer": "^10.4.20",
     "bcrypt": "^5.1.1",
     "connect-pg-simple": "^10.0.0",
@@ -33,6 +35,6 @@
   "devDependencies": {
     "dotenv": "^16.4.5",
     "nodemon": "^3.1.7",
-    "prisma": "^5.22.0"
+    "prisma": "^6.1.0"
   }
 }
