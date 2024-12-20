@@ -7,6 +7,7 @@ var logger = require('morgan');
 var session = require('express-session');
 var passport = require('./components/users/passportConfig');
 var PrismaSessionStore = require('./prismaSessionStore');
+var dotenv = require('dotenv').config()
 var prismaStore = new PrismaSessionStore();
 var prisma = new PrismaClient();
 
@@ -16,8 +17,6 @@ hbs.registerHelper('formatName', function(name) {
 });
 
 var indexRouter = require('./components/index/indexRoute');
-var aboutRouter = require('./components/about/aboutRoute');
-var contactRouter = require('./components/contact/contactRoute');
 var productRouter = require('./components/product/productRoute');
 var usersRouter = require('./components/users/usersRoute');
 
@@ -54,8 +53,6 @@ app.use(function(req, res, next) {
 
 app.use('/', indexRouter);
 app.use('/home', indexRouter);
-app.use('/about', aboutRouter);
-app.use('/contact', contactRouter);
 app.use('/product', productRouter);
 app.use('/detail', productRouter);
 app.use('/users', usersRouter);
