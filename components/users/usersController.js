@@ -1,90 +1,126 @@
-var { getDescriptionByProductName, getRelevantProducts, findProducts } = require('./productModel');
+var bcrypt = require('bcrypt');
+var passport = require('./passportConfig');
+var { findUserByUsername, createUser, findUserByEmail } = require('./usersModel');
 
-var getProduct = async (req, res) => {
-    try {
-        const searchQuery = req.query.q || ''; // Get search keyword from query string
-        const filters = {}; // You can add logic to extract filters from req.query if needed
-        const excludeProductId = null; // No product to exclude in this context
-        const limit = 9; // Default limit
-
-        // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
-
-        // Calculate discounted price (if any)
-        const productsWithDiscount = products.map(product => ({
-            ...product,
-            discountedPrice: product.promotion
-                ? (product.price * (1 - product.promotion / 100))
-                : null,
-        }));
-
-        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
-    } catch (err) {
-        console.error("Error in getProduct:", err);
-        res.status(500).send("Error retrieving products");
-    }
+var getLogin = (req, res) => {
+    res.render('login', { title: 'Log in' });
 };
 
-var searchFilter = async (req, res) => {
-    try {
-        const searchQuery = req.query.q || ''; // Get search keyword from query string
-        const filters = req.body.filters || {}; // Get filters from request body
-        const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
-        const limit = req.body.limit || 9; // Get limit from request body
+var postLogin = (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+      if (err) {
+        console.error(err);
+        return res.render('login', { error: 'An unexpected error occurred. Please try again.', title: 'Login' });
+      }
+      if (!user) {
+        // `info.message` contains the error message set in `passportConfig.js`
+        return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error(err);
+          return res.render('login', { error: 'Failed to log in. Please try again.', title: 'Login' });
+        }
+        return res.redirect('/');
+      });
+    })(req, res, next);
+  };
 
-        // console.log("searchQuery:", searchQuery);
-        // console.log("filters:", filters);
-        // console.log("excludeProductId:", excludeProductId);
-        // console.log("limit:", limit);
-
-        // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
-
-        // Calculate discounted price (if any)
-        const productsWithDiscount = products.map(product => ({
-            ...product,
-            discountedPrice: product.promotion
-                ? (product.price * (1 - product.promotion / 100))
-                : null,
-        }));
-
-        //res.json(productsWithDiscount);
-        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
-    } catch (err) {
-        console.error("Error in getProductJson:", err);
-        res.status(500).send("Error retrieving products");
-    }
+var getRegister = (req, res) => {
+    res.render('register', { title: 'Register' });
 };
 
-var showProductDetails = async (req, res) => {
+var postRegister = async (req, res) => {
+    var { username, email, password, confirmPassword } = req.body;
+  
+    if (!username || !password || !email || !confirmPassword) {
+        return res.render('register', { error: 'All fields are required', title: 'Register' });
+  }
+
     try {
-        var productName = req.params.name.replace(/-/g, " ").toUpperCase();
-        var product = await getDescriptionByProductName(productName);
+        var existingUser = await findUserByUsername(username);
+        var existingEmail = await findUserByEmail(email);
+
+        if (existingUser) {
+            return res.render('register', { error: 'Username already exists', title: 'Register' });
+        }
         
-        if (!product) {
-            return res.status(400).render("error", { message: "Product not found" });
+        if (existingEmail) {
+            return res.render('register', { error: 'Email already exists', title: 'Register' });
         }
 
-        var disPrice = product.promotion
-        ? (product.price * (1 - product.promotion / 100))
-        : null;
+        if (password !== confirmPassword) {
+            return res.render('register', { error: 'Confirm password must be the same as passwword', title: 'Register'});
+        }
 
-        var relevantProducts = await getRelevantProducts(product.category, product.id);
+        var hashedPassword = await bcrypt.hash(password, 10);
+        await createUser(username, email, hashedPassword);
 
-        relevantProducts = relevantProducts.map(product => ({
-            ...product,
-            discountedPrice: product.promotion
-            ? (product.price * (1 - product.promotion / 100))
-            : null,
-        }));
-
-        res.render('product-detail', { product, disPrice, relevantProducts });
-    } catch (error) {
-        console.error("Error in showProductDetails:", error);
-        res.status(500).send("Internal Server Error");
+        res.render('register', {
+          success: 'Registration successful! Please log in.',
+          title: 'Register'
+        });
+      } catch (error) {
+        console.error(error);
+        res.render('register', { error: 'Something went wrong!', title: 'Register' });
     }
 };
 
+var forgotPassword = (req, res) => {
+  res.render('forgot-password', { title: 'Forgot Password' });
+};
 
+function ensureAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    } else {
+        // Create an error object to pass to the view
+        const error = {
+            status: 401,
+            message: 'Unauthorized access. Please log in to continue.',
+            stack: (new Error()).stack // Optional: include stack trace if needed
+        };
 
-module.exports = { getProduct, showProductDetails, searchFilter };
+        // Render the error page and pass the error object
+        res.status(401).render('error', { error });
+    }
+}
+
+const getInfo = (req, res) => {
+    res.render('info', { title: 'Information'});
+}
+
+const getLogout = async (req, res, next) => {
+    req.logout(err => {
+        if (err) {
+            return next(err); 
+        }
+        res.redirect('/');
+    });
+};
+
+const checkAvailability = async (req, res) => {
+  const { username, email } = req.query;
+
+  try {
+    if (username) {
+      const user = await findUserByUsername(username);
+      const userExists = user !== null;
+      return res.json({ exists: userExists });
+    }
+
+    if (email) {
+      const user = await findUserByEmail(email);
+      const emailExists = user !== null; 
+      return res.json({ exists: emailExists });
+    }
+
+    res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+module.exports = { getLogin, postLogin, getRegister, postRegister, 
+getInfo, getLogout, ensureAuthenticated, checkAvailability, forgotPassword };
