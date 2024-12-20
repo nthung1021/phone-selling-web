@@ -16,18 +16,22 @@ model User {
 }
 
 model Product {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  price    Float
-  imageUrl String
-  shortDescription String
-  longDescription String
-  category String
-  promotion Float?
-  isFeatured Boolean
-  kind  String
-  gender String
-  material String
+  id                      Int    @id @default(autoincrement())
+  name                    String @unique
+  brand                   String
+  price                   Int
+  chipset                 String 
+  os                      String
+  ram                     Int
+  disk                    Int
+  screenSize              Float
+  refreshRate             Int
+  isFeatured              Boolean
+  imageUrl                String
+  shortDescription        String
+  longDescription         String
+  promotion               Float
+  number                  Int    
 }
 
 model Session {
