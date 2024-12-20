@@ -2,114 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-
-@layer base {
-    html {
-        font-family: 'Times New Roman', Times, serif
-    }
+#menu-content {
+    display: flex;
+    gap: 80px; /* Space between columns */
 }
-
-body {
-    min-height: 100vh;
+#menu-content ul {
+    list-style-type: none;
+    padding: 0;
     margin: 0;
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+}
+#menu-content li {
+    margin: 5px 0;
 }
 
-.mx-120 {
-    margin-left: 30rem;
-    margin-right: 30rem;
+#menu-content li:hover {
+    color: #f59e0b; /* Example hover color */
 }
 
-body {
-    font-family: 'Times New Roman', Times, serif;
-    background-color: white;
-}
 
-.title {
-    text-align: center;
-    background-color: rgb(235, 235, 198);
-    padding: 15px;
-    border-radius: 30px;
-    margin-bottom: 40px;
-}
 
-.meet {
-    margin-left: 15%;
-    margin-right: 15%;
-}
-
-.meet-name {
-    font-weight: bold;
-    font-size: 25px;
-}
-
-.social-table {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-
-.social-icon {
-    padding-right: 10px;
-}
-
-.meet-achievements {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    border-spacing: 20px;
-}
-
-.achivement {
-    display: flexbox;
-    flex-direction: column;
-    align-content: center;
-    justify-content: center;
-}
-
-.achivement-icon {
-    width: 40px;
-    height: auto;
-    box-sizing: border-box;
-}
-
-.achivement-title {
-    box-sizing: border-box;
-}
-
-.avatar {
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-.history {
-    padding-left: 100px;
-    padding-right: 100px;
-}
-.history .title {
-    background-color: white;
-}
-
-.path_pic {
-    margin: 20px;
-    scale: 0.9
-}
-
-.history_pic {
-    scale: 0.8;
-    padding: 20px;
-}
-
-body {
-    font-family: 'Times New Roman', Times, serif;
-    background-color: white;
-}
-
-.title {
-    text-align: center;
-    background-color: rgb(235, 235, 198);
-    padding: 15px;
-    border-radius: 30px;
-    margin-bottom: 40px;
-}
