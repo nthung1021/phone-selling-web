@@ -18,7 +18,7 @@ var getProduct = async (req, res) => {
                 : null,
         }));
 
-        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
+        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'Products' });
     } catch (err) {
         console.error("Error in getProduct:", err);
         res.status(500).send("Error retrieving products");
@@ -49,7 +49,7 @@ var searchFilter = async (req, res) => {
         }));
 
         //res.json(productsWithDiscount);
-        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
+        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'Products' });
     } catch (err) {
         console.error("Error in getProductJson:", err);
         res.status(500).send("Error retrieving products");
@@ -58,7 +58,7 @@ var searchFilter = async (req, res) => {
 
 var showProductDetails = async (req, res) => {
     try {
-        var productName = req.params.name.replace(/-/g, " ").toUpperCase();
+        var productName = req.params.name;
         var product = await getDescriptionByProductName(productName);
         
         if (!product) {
@@ -84,5 +84,7 @@ var showProductDetails = async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 };
+
+
 
 module.exports = { getProduct, showProductDetails, searchFilter };
