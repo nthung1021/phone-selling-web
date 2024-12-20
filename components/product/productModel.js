@@ -30,6 +30,9 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
         if (searchQuery) {
             whereConditions.OR = [
                 { name: { contains: searchQuery, mode: 'insensitive' } },
+                { brand: { contains: searchQuery, mode: 'insensitive' } },
+                { chipset: { contains: searchQuery, mode: 'insensitive' } },
+                { os: { contains: searchQuery, mode: 'insensitive' } },
             ];
         }
 
@@ -50,48 +53,62 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
             whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...priceConditions] : priceConditions;
         }
 
-        // Add gender filter conditions
-        if (filters.gender && filters.gender.length > 0) {
-            whereConditions.gender = { in: filters.gender };
+        // Add other filter conditions
+        if (filters.brand && filters.brand.length > 0) {
+            whereConditions.brand = { in: filters.brand };
         }
 
-        // Add category filter conditions
-        if (filters.category && filters.category.length > 0) {
-            whereConditions.category = { in: filters.category };
-        }
-
-         // Add kind filter conditions
-         if (filters.kind && filters.kind.length > 0) {
+        if (filters.chipset && filters.chipset.length > 0) {
             const childMapping = {
-                tops: ["Shirt", "T-shirt", "Coat", "Sweater", "Cardigan"],
-                bottoms: ["Trousers", "Dress", "Skirt", "Jeans", "Pants", "Shorts"],
-                shoes: ["Sandals", "Sneakers", "High heels", "Slip-ons", "Slippers", "Flip-flops", "Boots", "Ballet flats", "Crocs"],
-                accessories: ["Hat", "Belt", "Socks", "Scarf", "Glove", "Sunglasses", "Wallet", "Purse"]
+                Apple: ["A18 Pro", "A17 Pro"],
+                Snapdragon: ["8 Gen 3", "8 Gen 3 For Galaxy", "8 Gen 2"],
+                MediaTek: ["Dimensity 9400", "Dimensity 7200 Ultra", "Dimensity 7300", "Dimensity 8300-Ultra", "Dimensity 6300"],
+                Unisoc: ["T820"]
             };
-
+        
             // Get all selected child values
-            const selectedChildren = filters.kind.filter(kind =>
-                Object.values(childMapping).flat().includes(kind)
+            const selectedChildren = filters.chipset.filter(chipset =>
+                Object.values(childMapping).flat().includes(chipset)
             );
-
+        
             // Remove parent if corresponding child is selected
-            const filteredKinds = filters.kind.filter(kind => {
-                if (childMapping[kind]) {
+            const filteredChipsets = filters.chipset.filter(chipset => {
+                if (childMapping[chipset]) {
                     // Remove parent if at least one child value is selected
-                    return !selectedChildren.some(child => childMapping[kind].includes(child));
+                    return !selectedChildren.some(child => childMapping[chipset].includes(child));
                 }
                 return true;
             });
-
-            const kindConditions = filteredKinds.flatMap(kind => {
-                if (childMapping[kind]) {
-                    return childMapping[kind].map(child => ({ kind: child }));
+        
+            const chipsetConditions = filteredChipsets.flatMap(chipset => {
+                if (childMapping[chipset]) {
+                    return childMapping[chipset].map(child => ({ chipset: child }));
                 } else {
-                    return { kind: kind };
+                    return { chipset: chipset };
                 }
             });
+        
+            whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...chipsetConditions] : chipsetConditions;
+        }
 
-            whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...kindConditions] : kindConditions;
+        if (filters.os && filters.os.length > 0) {
+            whereConditions.os = { in: filters.os };
+        }
+
+        if (filters.ram && filters.ram.length > 0) {
+            whereConditions.ram = { in: filters.ram };
+        }
+
+        if (filters.disk && filters.disk.length > 0) {
+            whereConditions.disk = { in: filters.disk };
+        }
+
+        if (filters.screenSize && filters.screenSize.length > 0) {
+            whereConditions.screenSize = { in: filters.screenSize };
+        }
+
+        if (filters.refreshSize && filters.refreshSize.length > 0) {
+            whereConditions.refreshSize = { in: filters.refreshSize };
         }
 
         // Exclude specific product
@@ -113,5 +130,6 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
         throw error;
     }
 };
+
 
 module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts };
