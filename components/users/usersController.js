@@ -1,115 +1,90 @@
-var bcrypt = require('bcrypt');
-var passport = require('./passportConfig');
-var { findUserByUsername, createUser, findUserByEmail } = require('./usersModel');
+var { getDescriptionByProductName, getRelevantProducts, findProducts } = require('./productModel');
 
-var getLogin = (req, res) => {
-    res.render('login', { title: 'GA05 - Log in' });
-};
-
-var postLogin = (req, res, next) => {
-    passport.authenticate('local', (err, user, info) => {
-      if (err) {
-        console.error(err);
-        return res.render('login', { error: 'An unexpected error occurred. Please try again.', title: 'Login' });
-      }
-      if (!user) {
-        // `info.message` contains the error message set in `passportConfig.js`
-        return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
-      }
-      req.logIn(user, (err) => {
-        if (err) {
-          console.error(err);
-          return res.render('login', { error: 'Failed to log in. Please try again.', title: 'Login' });
-        }
-        return res.redirect('/');
-      });
-    })(req, res, next);
-  };
-
-var getRegister = (req, res) => {
-    res.render('register', { title: 'GA05 - Register' });
-};
-
-var postRegister = async (req, res) => {
-    var { username, email, password } = req.body;
-  
-    if (!username || !password || !email) {
-        return res.render('register', { error: 'All fields are required', title: 'Register' });
-  }
-
+var getProduct = async (req, res) => {
     try {
-        var existingUser = await findUserByUsername(username);
-        var existingEmail = await findUserByEmail(email);
-        if (existingUser) {
-            return res.render('register', { error: 'Username already exists', title: 'Register' });
-        }
-        if (existingEmail) {
-            return res.render('register', { error: 'Email already exists', title: 'Register' });
-        }
+        const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const filters = {}; // You can add logic to extract filters from req.query if needed
+        const excludeProductId = null; // No product to exclude in this context
+        const limit = 9; // Default limit
 
-        var hashedPassword = await bcrypt.hash(password, 10);
-        await createUser(username, email, hashedPassword);
+        // Find products based on search query and filters
+        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
 
-        res.render('register', {
-          success: 'Registration successful! Please log in.',
-          title: 'Register'
-        });
-      } catch (error) {
-        console.error(error);
-        res.render('register', { error: 'Something went wrong!', title: 'Register' });
+        // Calculate discounted price (if any)
+        const productsWithDiscount = products.map(product => ({
+            ...product,
+            discountedPrice: product.promotion
+                ? (product.price * (1 - product.promotion / 100))
+                : null,
+        }));
+
+        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
+    } catch (err) {
+        console.error("Error in getProduct:", err);
+        res.status(500).send("Error retrieving products");
     }
 };
 
-function ensureAuthenticated(req, res, next) {
-    if (req.isAuthenticated()) {
-        return next();
-    } else {
-        // Create an error object to pass to the view
-        const error = {
-            status: 401,
-            message: 'Unauthorized access. Please log in to continue.',
-            stack: (new Error()).stack // Optional: include stack trace if needed
-        };
+var searchFilter = async (req, res) => {
+    try {
+        const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const filters = req.body.filters || {}; // Get filters from request body
+        const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
+        const limit = req.body.limit || 9; // Get limit from request body
 
-        // Render the error page and pass the error object
-        res.status(401).render('error', { error });
+        // console.log("searchQuery:", searchQuery);
+        // console.log("filters:", filters);
+        // console.log("excludeProductId:", excludeProductId);
+        // console.log("limit:", limit);
+
+        // Find products based on search query and filters
+        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
+
+        // Calculate discounted price (if any)
+        const productsWithDiscount = products.map(product => ({
+            ...product,
+            discountedPrice: product.promotion
+                ? (product.price * (1 - product.promotion / 100))
+                : null,
+        }));
+
+        //res.json(productsWithDiscount);
+        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
+    } catch (err) {
+        console.error("Error in getProductJson:", err);
+        res.status(500).send("Error retrieving products");
     }
-}
+};
 
-const getInfo = (req, res) => {
-    res.render('info', { title: 'GA05 - Information'});
-}
-
-const getLogout = async (req, res, next) => {
-    req.logout(err => {
-        if (err) {
-            return next(err); 
+var showProductDetails = async (req, res) => {
+    try {
+        var productName = req.params.name.replace(/-/g, " ").toUpperCase();
+        var product = await getDescriptionByProductName(productName);
+        
+        if (!product) {
+            return res.status(400).render("error", { message: "Product not found" });
         }
-        res.redirect('/'); // Chuyển về home
-    });
+
+        var disPrice = product.promotion
+        ? (product.price * (1 - product.promotion / 100))
+        : null;
+
+        var relevantProducts = await getRelevantProducts(product.category, product.id);
+
+        relevantProducts = relevantProducts.map(product => ({
+            ...product,
+            discountedPrice: product.promotion
+            ? (product.price * (1 - product.promotion / 100))
+            : null,
+        }));
+
+        res.render('product-detail', { product, disPrice, relevantProducts });
+    } catch (error) {
+        console.error("Error in showProductDetails:", error);
+        res.status(500).send("Internal Server Error");
+    }
 };
 
-const checkAvailability = async (req, res) => {
-  const { username, email } = req.query;
 
-  try {
-    if (username) {
-      const user = await findUserByUsername(username);
-      const userExists = user !== null; // Kiểm tra nếu user là null
-      return res.json({ exists: userExists });
-    }
 
-    if (email) {
-      const user = await findUserByEmail(email);
-      const emailExists = user !== null; // Kiểm tra nếu user là null
-      return res.json({ exists: emailExists });
-    }
-
-    res.json({ exists: false });
-  } catch (error) {
-    console.error('Error checking availability:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-module.exports = { getLogin, postLogin, getRegister, postRegister, getInfo, getLogout, ensureAuthenticated, checkAvailability };
+module.exports = { getProduct, showProductDetails, searchFilter };
