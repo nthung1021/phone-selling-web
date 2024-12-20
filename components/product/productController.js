@@ -5,7 +5,7 @@ var getProduct = async (req, res) => {
         const searchQuery = req.query.q || ''; // Get search keyword from query string
         const filters = {}; // You can add logic to extract filters from req.query if needed
         const excludeProductId = null; // No product to exclude in this context
-        const limit = 10; // Default limit
+        const limit = 9; // Default limit
 
         // Find products based on search query and filters
         const products = await findProducts(searchQuery, filters, excludeProductId, limit);
@@ -14,7 +14,7 @@ var getProduct = async (req, res) => {
         const productsWithDiscount = products.map(product => ({
             ...product,
             discountedPrice: product.promotion
-                ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+                ? (product.price * (1 - product.promotion / 100))
                 : null,
         }));
 
@@ -30,7 +30,7 @@ var searchFilter = async (req, res) => {
         const searchQuery = req.query.q || ''; // Get search keyword from query string
         const filters = req.body.filters || {}; // Get filters from request body
         const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
-        const limit = req.body.limit || 10; // Get limit from request body
+        const limit = req.body.limit || 9; // Get limit from request body
 
         // console.log("searchQuery:", searchQuery);
         // console.log("filters:", filters);
@@ -44,11 +44,12 @@ var searchFilter = async (req, res) => {
         const productsWithDiscount = products.map(product => ({
             ...product,
             discountedPrice: product.promotion
-                ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+                ? (product.price * (1 - product.promotion / 100))
                 : null,
         }));
 
-        res.json(productsWithDiscount);
+        //res.json(productsWithDiscount);
+        res.render('product', { products: productsWithDiscount, query: searchQuery, title: 'GA05 - Products' });
     } catch (err) {
         console.error("Error in getProductJson:", err);
         res.status(500).send("Error retrieving products");
@@ -65,7 +66,7 @@ var showProductDetails = async (req, res) => {
         }
 
         var disPrice = product.promotion
-        ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+        ? (product.price * (1 - product.promotion / 100))
         : null;
 
         var relevantProducts = await getRelevantProducts(product.category, product.id);
@@ -73,7 +74,7 @@ var showProductDetails = async (req, res) => {
         relevantProducts = relevantProducts.map(product => ({
             ...product,
             discountedPrice: product.promotion
-            ? (product.price * (1 - product.promotion / 100)).toFixed(2)
+            ? (product.price * (1 - product.promotion / 100))
             : null,
         }));
 
