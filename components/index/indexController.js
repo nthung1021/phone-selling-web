@@ -31,7 +31,7 @@ var showFeaturedProducts = async (req, res) => {
                 : null,
         }));
 
-        res.render('index', { products: productsWithDiscount, title: 'GA05 - Home' });
+        res.render('index', { products: productsWithDiscount, title: 'Home' });
     } catch (err) {
         console.error("Error in showFeaturedProduct:", err);
         res.status(500).send("Error retrieving featured products");
