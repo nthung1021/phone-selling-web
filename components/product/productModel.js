@@ -4,10 +4,10 @@ var prisma = new PrismaClient();
 var getDescriptionByProductName = async (productName) => {
     try {
         return await prisma.product.findUnique({
-          where: { name: productName }
+          where: { lowercaseName: productName }
         });
     }   catch (error) {
-        console.error("Error fetching description by product ID:", error);
+        console.error("Error fetching description by product name:", error);
         throw new Error("Database error while fetching product description");
     }
 };
