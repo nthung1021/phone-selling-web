@@ -31,7 +31,8 @@ model Product {
   shortDescription        String
   longDescription         String
   promotion               Float
-  number                  Int    
+  number                  Int
+  lowercaseName           String @unique  
 }
 
 model Session {
