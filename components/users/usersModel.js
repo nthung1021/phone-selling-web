@@ -4,16 +4,16 @@ var prisma = new PrismaClient();
 var findUserByUsername = async (username) => {
     if (!username) {
         throw new Error('Username is required');
-      }
-  
+    }
+
     return prisma.user.findUnique({ where: { username } });
 };
 
 var findUserByEmail = async (email) => {
     if (!email) {
         throw new Error('Email is required');
-      }
-  
+    }
+
     return prisma.user.findUnique({ where: { email } });
 };
 
