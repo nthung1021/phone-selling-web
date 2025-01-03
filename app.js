@@ -10,11 +10,24 @@ var PrismaSessionStore = require('./prismaSessionStore');
 var dotenv = require('dotenv').config()
 var prismaStore = new PrismaSessionStore();
 var prisma = new PrismaClient();
-
 var hbs = require('hbs');
-hbs.registerHelper('formatName', function(name) {
+
+// Register the range helper
+hbs.registerHelper('formatName', function (name) {
     return name.toLowerCase().replace(/ /g, '-');
 });
+
+// hbs.registerHelper('range', function (start, end) {
+//     let result = [];
+//     for (let i = start; i <= end; i++) {
+//         result.push(i);
+//     }
+//     return result;
+// });
+
+// hbs.registerHelper('lte', function (a, b) {
+//     return a <= b;
+// });
 
 var indexRouter = require('./components/index/indexRoute');
 var productRouter = require('./components/product/productRoute');
@@ -38,15 +51,15 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
-      maxAge: 1000 * 60 * 60 * 24 * 7 // (miliseconds, total: 7 days)
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24 * 7 // (miliseconds, total: 7 days)
     } // Set true if using HTTPS
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     res.locals.user = req.user; // Make 'req.user' available as 'user' in templates
     next();
 });
@@ -58,12 +71,12 @@ app.use('/detail', productRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};

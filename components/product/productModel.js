@@ -4,9 +4,9 @@ var prisma = new PrismaClient();
 var getDescriptionByProductName = async (productName) => {
     try {
         return await prisma.product.findUnique({
-          where: { lowercaseName: productName }
+            where: { lowercaseName: productName }
         });
-    }   catch (error) {
+    } catch (error) {
         console.error("Error fetching description by product name:", error);
         throw new Error("Database error while fetching product description");
     }
@@ -65,12 +65,12 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
                 MediaTek: ["Dimensity 9400", "Dimensity 7200 Ultra", "Dimensity 7300", "Dimensity 8300-Ultra", "Dimensity 6300"],
                 Unisoc: ["T820"]
             };
-        
+
             // Get all selected child values
             const selectedChildren = filters.chipset.filter(chipset =>
                 Object.values(childMapping).flat().includes(chipset)
             );
-        
+
             // Remove parent if corresponding child is selected
             const filteredChipsets = filters.chipset.filter(chipset => {
                 if (childMapping[chipset]) {
@@ -79,7 +79,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
                 }
                 return true;
             });
-        
+
             const chipsetConditions = filteredChipsets.flatMap(chipset => {
                 if (childMapping[chipset]) {
                     return childMapping[chipset].map(child => ({ chipset: child }));
@@ -87,7 +87,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
                     return { chipset: chipset };
                 }
             });
-        
+
             whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...chipsetConditions] : chipsetConditions;
         }
 
@@ -131,5 +131,58 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
     }
 };
 
+const getProductsByFilters = async (filters) => {
+    const whereClause = {};
+    console.log('filters:', filters);
 
-module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts };
+    // Map filters to Prisma `where` clause (case-insensitive)
+    Object.keys(filters).forEach((key) => {
+        const values = Array.isArray(filters[key]) ? filters[key] : [filters[key]];
+        if (whereClause[key]) {
+            whereClause[key].OR = values.map(value => {
+                if (typeof value === 'string') {
+                    return { [key]: { contains: value, mode: 'insensitive' } };
+                } else if (typeof value === 'number') {
+                    return { [key]: value };
+                }
+            });
+        } else {
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push({
+                OR: values.map(value => {
+                    if (typeof value === 'string') {
+                        return { [key]: { contains: value, mode: 'insensitive' } };
+                    } else if (typeof value === 'number') {
+                        return { [key]: value };
+                    }
+                })
+            });
+        }
+    });
+
+    // Fetch products
+    const products = await prisma.product.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+            price: true,
+            promotion: true, // Fetch promotion to calculate discounted price
+            lowercaseName: true,
+        },
+    });
+
+    // Add discountedPrice field dynamically
+    const updatedProducts = products.map((product) => {
+        const discountedPrice = Math.round(product.price * (100 - (product.promotion || 0)) / 100);
+        return {
+            ...product,
+            discountedPrice,
+        };
+    });
+
+    return updatedProducts;
+};
+
+module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters };
