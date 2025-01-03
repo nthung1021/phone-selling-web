@@ -131,7 +131,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
     }
 };
 
-const getProductsByFilters = async (filters, page = 1, pageSize = 9) => {
+const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize = 9) => {
     const whereClause = {};
 
     // Map filters to Prisma `where` clause (case-insensitive)
@@ -164,6 +164,20 @@ const getProductsByFilters = async (filters, page = 1, pageSize = 9) => {
     // Calculate pagination
     const skip = (page - 1) * pageSize;
 
+    // Sort products based on the sortOrder
+    let orderBy = {};
+    if (sortOrder) {
+        if (sortOrder === "name-asc") {
+            orderBy = { name: 'asc' };
+        } else if (sortOrder === "name-desc") {
+            orderBy = { name: 'desc' };
+        } else if (sortOrder === "price-asc") {
+            orderBy = { price: 'asc' };
+        } else if (sortOrder === "price-desc") {
+            orderBy = { price: 'desc' };
+        }
+    }
+
     // Fetch total count of products
     const totalCount = await prisma.product.count({
         where: whereClause,
@@ -185,6 +199,7 @@ const getProductsByFilters = async (filters, page = 1, pageSize = 9) => {
         },
         skip: skip,
         take: pageSize,
+        orderBy: orderBy,
     });
 
     // Add discountedPrice field dynamically

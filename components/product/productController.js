@@ -89,6 +89,7 @@ const getFilteredProducts = async (req, res) => {
     try {
         const filters = req.query;
         const page = parseInt(filters.page, 10) || 1; // Get page number from query string, default to 1 if not provided
+        const sortOrder = filters.sort || ''; // Get sort order from query string, default to 'asc' if not provided
 
         // Remove trailing characters like GB, Hz and convert to integers if they exist
         if (filters.ram) filters.ram = parseInt(filters.ram.replace(/GB$/, ''), 10);
@@ -97,8 +98,9 @@ const getFilteredProducts = async (req, res) => {
         delete filters.storage;
         delete filters['refresh rate'];
         delete filters.page;
+        delete filters.sort;
 
-        const data = await getProductsByFilters(filters, page);
+        const data = await getProductsByFilters(filters, page, sortOrder);
         const products = data.products;
         const totalPages = data.totalPages;
 
