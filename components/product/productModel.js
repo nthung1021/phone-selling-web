@@ -22,7 +22,7 @@ var getRelevantProducts = async (category, excludeProductId, limit = 4) => {
     });
 };
 
-const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
+const findProducts = async (searchQuery, filters, excludeProductId, currentPage, limit) => {
     try {
         const whereConditions = {};
 
@@ -121,6 +121,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
         // Fetch products with the combined conditions
         const products = await prisma.product.findMany({
             where: whereConditions,
+            skip: (currentPage - 1) * limit,
             take: limit,
         });
 

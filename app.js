@@ -19,6 +19,7 @@ hbs.registerHelper('formatName', function(name) {
 var indexRouter = require('./components/index/indexRoute');
 var productRouter = require('./components/product/productRoute');
 var usersRouter = require('./components/users/usersRoute');
+var apiRouter = require('./components/product/apiRoute')
 
 var app = express();
 
@@ -56,6 +57,7 @@ app.use('/home', indexRouter);
 app.use('/product', productRouter);
 app.use('/detail', productRouter);
 app.use('/users', usersRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

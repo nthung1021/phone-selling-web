@@ -1,14 +1,41 @@
 var { getDescriptionByProductName, getRelevantProducts, findProducts } = require('./productModel');
 
-var getProduct = async (req, res) => {
+var getProduct_json = async (req, res) => {
     try {
         const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const currentPage = parseInt(req.query.page) || 1; // get current page
         const filters = {}; // You can add logic to extract filters from req.query if needed
         const excludeProductId = null; // No product to exclude in this context
         const limit = 9; // Default limit
 
         // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
+        const products = await findProducts(searchQuery, filters, excludeProductId, currentPage, limit);
+
+        // Calculate discounted price (if any)
+        const productsWithDiscount = products.map(product => ({
+            ...product,
+            discountedPrice: product.promotion
+                ? (product.price * (1 - product.promotion / 100))
+                : null,
+        }));
+
+        res.json({ products: productsWithDiscount, query: searchQuery, title: 'Products' });
+    } catch (err) {
+        console.error("Error in getProduct:", err);
+        res.status(500).send("Error retrieving products");
+    }
+}
+
+var getProduct = async (req, res) => {
+    try {
+        const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const currentPage = parseInt(req.query.page) || 1; // get current page
+        const filters = {}; // You can add logic to extract filters from req.query if needed
+        const excludeProductId = null; // No product to exclude in this context
+        const limit = 9; // Default limit
+
+        // Find products based on search query and filters
+        const products = await findProducts(searchQuery, filters, excludeProductId, currentPage, limit);
 
         // Calculate discounted price (if any)
         const productsWithDiscount = products.map(product => ({
@@ -28,6 +55,7 @@ var getProduct = async (req, res) => {
 var searchFilter = async (req, res) => {
     try {
         const searchQuery = req.query.q || ''; // Get search keyword from query string
+        const currentPage = parseInt(req.query.page) || 1; // get current page
         const filters = req.body.filters || {}; // Get filters from request body
         const excludeProductId = req.body.excludeProductId || null; // Get excludeProductId from request body
         const limit = req.body.limit || 9; // Get limit from request body
@@ -38,7 +66,7 @@ var searchFilter = async (req, res) => {
         // console.log("limit:", limit);
 
         // Find products based on search query and filters
-        const products = await findProducts(searchQuery, filters, excludeProductId, limit);
+        const products = await findProducts(searchQuery, filters, excludeProductId, currentPage, limit);
 
         // Calculate discounted price (if any)
         const productsWithDiscount = products.map(product => ({
@@ -85,6 +113,4 @@ var showProductDetails = async (req, res) => {
     }
 };
 
-
-
-module.exports = { getProduct, showProductDetails, searchFilter };
+module.exports = { getProduct_json, getProduct, showProductDetails, searchFilter };
