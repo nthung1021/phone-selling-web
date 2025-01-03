@@ -88,6 +88,7 @@ var showProductDetails = async (req, res) => {
 const getFilteredProducts = async (req, res) => {
     try {
         const filters = req.query;
+        const page = parseInt(filters.page, 10) || 1; // Get page number from query string, default to 1 if not provided
 
         // Remove trailing characters like GB, Hz and convert to integers if they exist
         if (filters.ram) filters.ram = parseInt(filters.ram.replace(/GB$/, ''), 10);
@@ -95,12 +96,16 @@ const getFilteredProducts = async (req, res) => {
         if (filters['refresh rate']) filters.refreshRate = parseInt(filters['refresh rate'].replace(/Hz$/, ''), 10);
         delete filters.storage;
         delete filters['refresh rate'];
+        delete filters.page;
 
-        const products = await getProductsByFilters(filters);
+        const data = await getProductsByFilters(filters, page);
+        const products = data.products;
+        const totalPages = data.totalPages;
 
         res.json({
             success: true,
             products,
+            totalPages
         });
     } catch (error) {
         console.error('Error fetching filtered products:', error);

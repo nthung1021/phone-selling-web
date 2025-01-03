@@ -131,34 +131,46 @@ const findProducts = async (searchQuery, filters, excludeProductId, limit) => {
     }
 };
 
-const getProductsByFilters = async (filters) => {
+const getProductsByFilters = async (filters, page = 1, pageSize = 9) => {
     const whereClause = {};
-    console.log('filters:', filters);
 
     // Map filters to Prisma `where` clause (case-insensitive)
     Object.keys(filters).forEach((key) => {
         const values = Array.isArray(filters[key]) ? filters[key] : [filters[key]];
-        if (whereClause[key]) {
-            whereClause[key].OR = values.map(value => {
-                if (typeof value === 'string') {
-                    return { [key]: { contains: value, mode: 'insensitive' } };
-                } else if (typeof value === 'number') {
-                    return { [key]: value };
-                }
-            });
-        } else {
-            whereClause.AND = whereClause.AND || [];
-            whereClause.AND.push({
-                OR: values.map(value => {
+        if (key !== 'page' && key !== 'pageSize') {
+            if (whereClause[key]) {
+                whereClause[key].OR = values.map(value => {
                     if (typeof value === 'string') {
                         return { [key]: { contains: value, mode: 'insensitive' } };
                     } else if (typeof value === 'number') {
                         return { [key]: value };
                     }
-                })
-            });
+                });
+            } else {
+                whereClause.AND = whereClause.AND || [];
+                whereClause.AND.push({
+                    OR: values.map(value => {
+                        if (typeof value === 'string') {
+                            return { [key]: { contains: value, mode: 'insensitive' } };
+                        } else if (typeof value === 'number') {
+                            return { [key]: value };
+                        }
+                    })
+                });
+            }
         }
     });
+
+    // Calculate pagination
+    const skip = (page - 1) * pageSize;
+
+    // Fetch total count of products
+    const totalCount = await prisma.product.count({
+        where: whereClause,
+    });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / pageSize);
 
     // Fetch products
     const products = await prisma.product.findMany({
@@ -171,6 +183,8 @@ const getProductsByFilters = async (filters) => {
             promotion: true, // Fetch promotion to calculate discounted price
             lowercaseName: true,
         },
+        skip: skip,
+        take: pageSize,
     });
 
     // Add discountedPrice field dynamically
@@ -182,7 +196,10 @@ const getProductsByFilters = async (filters) => {
         };
     });
 
-    return updatedProducts;
+    return {
+        products: updatedProducts,
+        totalPages: totalPages,
+    };
 };
 
 module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters };

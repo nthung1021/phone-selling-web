@@ -90,7 +90,13 @@
             </div>
             {{/each}}
             <!-- /Products -->
+
         </section>
+        <!-- Pagination -->
+        <div id="pagination-container" class="flex justify-center mt-10">
+            <!-- Pagination buttons will be dynamically generated here -->
+        </div>
+        <!-- /Pagination -->
     </div>
 </section>
 
@@ -142,11 +148,14 @@
 
             // Bind events for new checkboxes
             document.querySelectorAll("#filter-container input[type='checkbox']").forEach((checkbox) => {
-                checkbox.addEventListener("change", applyFilters);
+                checkbox.addEventListener("change", (event) => {
+                    applyFilters(1); // Gọi applyFilters khi checkbox thay đổi
+                });
             });
         };
 
-        const applyFilters = async () => {
+        const applyFilters = async (page = 1) => {
+            console.log("page:", page); // Thêm log ở đây
             const selectedFilters = {};
 
             document.querySelectorAll("#filter-container input[type='checkbox']:checked").forEach((checkbox) => {
@@ -166,10 +175,10 @@
                 .map((key) => selectedFilters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
                 .join("&");
 
-            try {
-                console.log("Query:", query);
+            console.log("Query:", query); // Thêm log ở đây
 
-                const response = await fetch(`/product/filter?${query}`, {
+            try {
+                const response = await fetch(`/product/filter?page=${page}&${query}`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -182,15 +191,55 @@
                 }
 
                 const data = await response.json();
-                console.log("Filtered products:", data);
 
                 if (data.success) {
                     updateProductList(data.products); // Cập nhật UI với danh sách sản phẩm lọc được
+                    changeUrlWithFilters(selectedFilters, page); // Cập nhật URL với bộ lọc đã chọn
+                    updatePagination(data.totalPages, page); // Cập nhật pagination
                 } else {
                     console.error("Error fetching products:", data.message);
                 }
             } catch (error) {
                 console.error("Error fetching filtered products:", error);
+            }
+        };
+
+        // Thay đổi URL khi filter
+        const changeUrlWithFilters = (filters, page) => {
+            const query = Object.keys(filters)
+                .map((key) => filters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
+                .join("&");
+            const newUrl = `${window.location.pathname}?page=${page}&${query}`;
+            window.history.pushState({ path: newUrl }, '', newUrl); // Cập nhật URL mà không reload trang
+        };
+
+        // Cập nhật pagination
+        const updatePagination = (totalPages, currentPage) => {
+            console.log(`Total pages: ${totalPages}, Current page: ${currentPage}`);  // Thêm log ở đây
+
+            const paginationContainer = document.getElementById("pagination-container");
+            console.log(paginationContainer);
+            if (!paginationContainer) {
+                console.error("Pagination container not found.");
+                return;
+            }
+
+            paginationContainer.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement("button");
+                pageButton.textContent = i;
+                pageButton.classList.add("px-3", "py-1", "border", "mx-1", "rounded");
+                if (i === currentPage) {
+                    pageButton.classList.add("bg-violet-900", "text-white");
+                } else {
+                    pageButton.classList.add("bg-white", "text-violet-900");
+                    pageButton.addEventListener("click", (event) => {
+                        event.preventDefault(); // Prevent default action
+                        applyFilters(i); // Pass the correct page number to applyFilters
+                    });
+                }
+                paginationContainer.appendChild(pageButton);
             }
         };
 
