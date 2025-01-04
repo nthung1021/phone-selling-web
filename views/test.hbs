@@ -45,93 +45,11 @@
         </div>
         <!-- /Sort by Button -->
         <div class="lg:flex-grow lg:border-l lg:pl-5">
-            <section class="product-list mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-5 pb-10 lg:grid-cols-3">
-                <!-- Products -->
-                {{#each products}}
-                <div class="flex flex-col">
-                    <div class="relative flex">
-                        <img class="" src="{{this.imageUrl}}" alt="{{this.name}}" />
-                        <div
-                            class="absolute flex h-full w-full items-center justify-center gap-3 opacity-0 duration-150 hover:opacity-100">
-                            <a href="/detail/{{formatName this.name}}"
-                                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                                </svg>
-                            </a>
-                            <span
-                                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                    class="h-4 w-4">
-                                    <path
-                                        d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                                </svg>
-                            </span>
-                        </div>
-
-                        {{#if this.promotion}}
-                        <div class="absolute right-1 mt-3 flex items-center justify-center bg-amber-400">
-                            <p class="px-2 py-2 text-sm">&minus; {{this.promotion}}&percnt; OFF</p>
-                        </div>
-                        {{/if}}
-                    </div>
-
-                    <div>
-                        <p class="mt-2">{{this.name}}</p>
-                        {{#if this.discountedPrice}}
-                        <p class="font-medium text-violet-900">
-                            {{formatPrice this.discountedPrice}} VND
-                            <span class="text-sm text-gray-500 line-through">{{formatPrice this.price}} VND</span>
-                        </p>
-                        {{else}}
-                        <p class="font-medium text-violet-900">
-                            {{formatPrice this.price}} VND
-                        </p>
-                        {{/if}}
-                    </div>
-
-                    <div class="flex items-center">
-                        {{#each (range 1 5)}}
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                            class="h-4 w-4 {{#if (lte this 4)}}text-yellow-400{{else}}text-gray-200{{/if}}">
-                            <path fill-rule="evenodd"
-                                d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        {{/each}}
-                        <p class="text-sm text-gray-400">(150)</p>
-                    </div>
-
-                    <div>
-                        <button class="my-5 h-10 w-full bg-violet-900 text-white">
-                            Add to cart
-                        </button>
-                    </div>
-                </div>
-                {{/each}}
-                <!-- /Products -->
+            <section class="product-list mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-5 pb-10 lg:grid-cols-3"
+                id="product-list">
 
             </section>
         </div>
-
-        <!-- Pagination Search-->
-        <nav class="justify bg-center">
-            <ul class="inline-flex -space-x-px text-sm">
-                <li>
-                    <a href="#" data-page="previous"
-                        class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Previous</a>
-                </li>
-
-                <li>
-                    <a href="#" data-page="next"
-                        class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Next</a>
-                </li>
-            </ul>
-        </nav>
 
         <!-- Pagination Filter -->
         <div id="pagination-container" class="flex justify-center mt-10">
@@ -140,6 +58,129 @@
         <!-- /Pagination -->
     </div>
 </section>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const productList = document.getElementById("product-list");
+        const paginationContainer = document.getElementById("pagination-container");
+        const filter = document.getElementById("filter-container");
+        const sort = document.getElementById("sort-options");
+
+        const fetchProducts = async (page = 1) => {
+            const queryParams = new URLSearchParams();
+            queryParams.set("page", page);
+
+            const url = window.location.href;
+            let response;
+            if (url.includes("filter")) {
+                response = await fetch(`/api${url}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+            } else {
+                response = await fetch(`/api${window.location.pathname}?${queryParams.toString()}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+            }
+
+            const data = await response.json();
+            await renderProducts(data.products);
+            await renderPagination(data.totalPages, page);
+        }
+
+        const renderProducts = async (products) => {
+            productList.innerHTML = "";
+            products.forEach(product => {
+                const productHTML = `
+                    <div class="flex flex-col">
+                        <div class="relative flex">
+                            <img src="${product.imageUrl}" alt="${product.name}" />
+                            <div class="absolute flex h-full w-full items-center justify-center gap-3 opacity-0 duration-150 hover:opacity-100">
+                                <a href="/detail/${product.lowercaseName}"
+                                    class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                        stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                </a>
+                                <span class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                        class="h-4 w-4">
+                                        <path
+                                            d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                                    </svg>
+                                </span>
+                            </div>
+                            ${product.promotion ? `<div class="absolute right-1 mt-3 flex items-center justify-center bg-amber-400"><p class="px-2 py-2 text-sm">&minus; ${product.promotion}% OFF</p></div>` : ''}
+                        </div>
+                        
+                        <div>
+                            <p class="mt-2">${product.name}</p>
+                            ${product.discountedPrice
+                        ? `<p class="font-medium text-violet-900">${product.discountedPrice.toLocaleString('vi-VN')} VND <span class="text-sm text-gray-500 line-through">${product.price.toLocaleString('vi-VN')} VND</span></p>`
+                        : `<p class="font-medium text-violet-900">${product.price.toLocaleString('vi-VN')} VND</p>`}
+                        </div>
+                        
+                        <div class="flex items-center">
+                            {{#each (range 1 5)}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="h-4 w-4 {{#if (lte this 4)}}text-yellow-400{{else}}text-gray-200{{/if}}">
+                                <path fill-rule="evenodd"
+                                    d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{/each}}
+                            <p class="text-sm text-gray-400">(150)</p>
+                        </div>
+                        <div>
+                            <button class="my-5 h-10 w-full bg-violet-900 text-white">Add to cart</button>
+                        </div>
+                    </div>`;
+                productList.insertAdjacentHTML("beforeend", productHTML);
+            });
+        }
+
+        const renderPagination = (totalPages, currentPage) => {
+            paginationContainer.innerHTML = "";
+
+            if (totalPages <= 1) return;
+
+            const createPageButton = (page, text = page) => {
+                const button = document.createElement("button");
+                button.textContent = text;
+                button.classList.add("px-3", "py-1", "border", "mx-1", "rounded");
+                if (page === currentPage) {
+                    button.classList.add("bg-violet-900", "text-white");
+                } else {
+                    button.classList.add("bg-white", "text-violet-900");
+                    button.addEventListener("click", () => fetchProducts(page));
+                }
+                return button;
+            };
+
+            if (currentPage > 1) {
+                paginationContainer.appendChild(createPageButton(currentPage - 1, "Previous"));
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                paginationContainer.appendChild(createPageButton(i));
+            }
+
+            if (currentPage < totalPages) {
+                paginationContainer.appendChild(createPageButton(currentPage + 1, "Next"));
+            }
+        };
+
+        fetchProducts();
+    });
+</script>
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -195,7 +236,11 @@
                     console.error("Error fetching data:", error);
                 });
         }
+        //});
 
+        //document.getElementById('form').addEventListener('submit', handleFormSubmit);
+        //document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
+        //document.addEventListener("DOMContentLoaded", () => {
         // Initialize filter sidebar visibility toggle
         const filterSidebar = document.getElementById("filters-sidebar");
         const toggleFilters = document.getElementById("toggle-filters");

@@ -1620,10 +1620,6 @@ video {
     gap: 1.25rem;
   }
 
-  .lg\:overflow-y-visible {
-    overflow-y: visible;
-  }
-
   .lg\:border-l {
     border-left-width: 1px;
   }
