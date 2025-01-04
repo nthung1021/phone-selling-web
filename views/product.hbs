@@ -1,14 +1,29 @@
 <section class="container mx-auto flex-grow max-w-[1200px] border-b py-5 lg:flex lg:flex-row lg:py-10">
-    <!-- sidebar  -->
-    <section class="hidden w-[300px] flex-shrink-0 px-4 lg:block">
-        <div class="flex border-b pb-5">
-            <div class="w-full">
-                <p class="mb-3 font-medium">FILTERS</p>
-                <div id="filter-container"></div>
-            </div>
+    <!-- Filter toggle button -->
+    <div class="lg:hidden flex justify-between items-center px-4 py-3 border-b">
+        <button id="toggle-filters" class="flex items-center gap-2 text-violet-900 font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 6h16.5m-16.5 6h16.5" />
+            </svg>
+            Filters
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <section id="filters-sidebar"
+        class="hidden fixed inset-0 z-20 bg-white p-4 lg:static lg:block lg:w-[300px] lg:flex-shrink-0">
+        <div class="flex justify-between items-center mb-4 lg:hidden">
+            <p class="font-medium text-lg">Filters</p>
+            <button id="close-filters" class="text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
+        <div id="filter-container"></div>
     </section>
-    <!-- /sidebar  -->
 
     <div>
         <!-- Sort by Button -->
@@ -29,76 +44,79 @@
             <div class="px-4 py-2 cursor-pointer" data-sort="name-desc">Name: Z to A</div>
         </div>
         <!-- /Sort by Button -->
+        <div class="lg:flex-grow lg:border-l lg:pl-5">
+            <section class="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-5 pb-10 lg:grid-cols-3">
 
-        <section class="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-5 pb-10 lg:grid-cols-3">
+                <!-- Products -->
+                {{#each products}}
+                <div class="flex flex-col">
+                    <div class="relative flex">
+                        <img class="" src="{{this.imageUrl}}" alt="{{this.name}}" />
+                        <div
+                            class="absolute flex h-full w-full items-center justify-center gap-3 opacity-0 duration-150 hover:opacity-100">
+                            <a href="/detail/{{formatName this.name}}"
+                                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                    stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                            </a>
+                            <span
+                                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                                    class="h-4 w-4">
+                                    <path
+                                        d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+                                </svg>
+                            </span>
+                        </div>
 
-            <!-- Products -->
-            {{#each products}}
-            <div class="flex flex-col">
-                <div class="relative flex">
-                    <img class="" src="{{this.imageUrl}}" alt="{{this.name}}" />
-                    <div
-                        class="absolute flex h-full w-full items-center justify-center gap-3 opacity-0 duration-150 hover:opacity-100">
-                        <a href="/detail/{{formatName this.name}}"
-                            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                                stroke="currentColor" class="h-4 w-4">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
-                        </a>
-                        <span class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-amber-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
-                                class="h-4 w-4">
-                                <path
-                                    d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-                            </svg>
-                        </span>
+                        {{#if this.promotion}}
+                        <div class="absolute right-1 mt-3 flex items-center justify-center bg-amber-400">
+                            <p class="px-2 py-2 text-sm">&minus; {{this.promotion}}&percnt; OFF</p>
+                        </div>
+                        {{/if}}
                     </div>
 
-                    {{#if this.promotion}}
-                    <div class="absolute right-1 mt-3 flex items-center justify-center bg-amber-400">
-                        <p class="px-2 py-2 text-sm">&minus; {{this.promotion}}&percnt; OFF</p>
+                    <div>
+                        <p class="mt-2">{{this.name}}</p>
+                        {{#if this.discountedPrice}}
+                        <p class="font-medium text-violet-900">
+                            {{formatPrice this.discountedPrice}} VND
+                            <span class="text-sm text-gray-500 line-through">{{formatPrice this.price}} VND</span>
+                        </p>
+                        {{else}}
+                        <p class="font-medium text-violet-900">
+                            {{formatPrice this.price}} VND
+                        </p>
+                        {{/if}}
                     </div>
-                    {{/if}}
+
+                    <div class="flex items-center">
+                        {{#each (range 1 5)}}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                            class="h-4 w-4 {{#if (lte this 4)}}text-yellow-400{{else}}text-gray-200{{/if}}">
+                            <path fill-rule="evenodd"
+                                d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        {{/each}}
+                        <p class="text-sm text-gray-400">(150)</p>
+                    </div>
+
+                    <div>
+                        <button class="my-5 h-10 w-full bg-violet-900 text-white">
+                            Add to cart
+                        </button>
+                    </div>
                 </div>
+                {{/each}}
+                <!-- /Products -->
 
-                <div>
-                    <p class="mt-2">{{this.name}}</p>
-                    {{#if this.discountedPrice}}
-                    <p class="font-medium text-violet-900">
-                        {{this.discountedPrice}}VND
-                        <span class="text-sm text-gray-500 line-through">{{this.price}}VND</span>
-                    </p>
-                    {{else}}
-                    <p class="font-medium text-violet-900">
-                        {{this.price}}VND
-                    </p>
-                    {{/if}}
-                </div>
+            </section>
+        </div>
 
-                {{!-- <div class="flex items-center">
-                    {{#each (range 1 5)}}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-                        class="h-4 w-4 {{#if (lte this ../this.rating)}}text-yellow-400{{else}}text-gray-200{{/if}}">
-                        <path fill-rule="evenodd"
-                            d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    {{/each}}
-                    <p class="text-sm text-gray-400">({{this.reviewCount}})</p>
-                </div> --}}
-
-                <div>
-                    <button class="my-5 h-10 w-full bg-violet-900 text-white">
-                        Add to cart
-                    </button>
-                </div>
-            </div>
-            {{/each}}
-            <!-- /Products -->
-
-        </section>
         <!-- Pagination -->
         <div id="pagination-container" class="flex justify-center mt-10">
             <!-- Pagination buttons will be dynamically generated here -->
@@ -109,6 +127,31 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+        // Initialize filter sidebar visibility toggle
+        const filterSidebar = document.getElementById("filters-sidebar");
+        const toggleFilters = document.getElementById("toggle-filters");
+        const closeFilters = document.getElementById("close-filters");
+
+        // Hiển thị bộ lọc
+        toggleFilters?.addEventListener("click", () => {
+            filterSidebar.classList.remove("hidden");
+            filterSidebar.classList.add("block");
+        });
+
+        // Ẩn bộ lọc
+        closeFilters?.addEventListener("click", () => {
+            filterSidebar.classList.remove("block");
+            filterSidebar.classList.add("hidden");
+        });
+
+        // Đóng bộ lọc khi nhấp ra ngoài
+        document.addEventListener("click", (event) => {
+            if (!filterSidebar.contains(event.target) && !toggleFilters.contains(event.target)) {
+                filterSidebar.classList.remove("block");
+                filterSidebar.classList.add("hidden");
+            }
+        });
+
         // Initialize sort options dropdown visibility toggle
         const sortButton = document.getElementById("sort-button");
         const sortOptions = document.getElementById("sort-options");
@@ -299,19 +342,25 @@
                             </div>
                             ${product.promotion ? `<div class="absolute right-1 mt-3 flex items-center justify-center bg-amber-400"><p class="px-2 py-2 text-sm">&minus; ${product.promotion}% OFF</p></div>` : ''}
                         </div>
+                        
                         <div>
                             <p class="mt-2">${product.name}</p>
                             ${product.discountedPrice
-                        ? `<p class="font-medium text-violet-900">${product.discountedPrice} VND <span class="text-sm text-gray-500 line-through">${product.price} VND</span></p>`
-                        : `<p class="font-medium text-violet-900">${product.price} VND</p>`}
+                        ? `<p class="font-medium text-violet-900">${product.discountedPrice.toLocaleString('vi-VN')} VND <span class="text-sm text-gray-500 line-through">${product.price.toLocaleString('vi-VN')} VND</span></p>`
+                        : `<p class="font-medium text-violet-900">${product.price.toLocaleString('vi-VN')} VND</p>`}
                         </div>
-                        {{!-- <div class="flex items-center">
-                            ${Array.from({ length: 5 }, (_, i) => i < product.rating
-                            ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-yellow-400"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" /></svg>'
-                            : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 text-gray-200"><path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z" clip-rule="evenodd" /></svg>'
-                        ).join('')}
-                            <p class="text-sm text-gray-400">(${product.reviewCount})</p>
-                        </div> --}}
+                        
+                        <div class="flex items-center">
+                            {{#each (range 1 5)}}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="h-4 w-4 {{#if (lte this 4)}}text-yellow-400{{else}}text-gray-200{{/if}}">
+                                <path fill-rule="evenodd"
+                                    d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            {{/each}}
+                            <p class="text-sm text-gray-400">(150)</p>
+                        </div>
                         <div>
                             <button class="my-5 h-10 w-full bg-violet-900 text-white">Add to cart</button>
                         </div>
@@ -319,6 +368,7 @@
                 productContainer.insertAdjacentHTML("beforeend", productHTML);
             });
         };
+
         // Call the function to generate filter options
         generateFilterOptions();
     });

@@ -16,20 +16,21 @@ var hbs = require('hbs');
 hbs.registerHelper('formatName', function (name) {
     return name.toLowerCase().replace(/ /g, '-');
 });
-
-// hbs.registerHelper('range', function (start, end) {
-//     let result = [];
-//     for (let i = start; i <= end; i++) {
-//         result.push(i);
-//     }
-//     return result;
-// });
-
-hbs.registerHelper('lt', function (a, b) {
-    return a < b;
+hbs.registerHelper('range', function (start, end) {
+    let result = [];
+    for (let i = start; i <= end; i++) {
+        result.push(i);
+    }
+    return result;
+});
+hbs.registerHelper('lte', function (a, b) {
+    return a <= b;
 });
 hbs.registerHelper('gt', function (a, b) {
     return a > b;
+});
+hbs.registerHelper('formatPrice', function (price) {
+    return price.toLocaleString('vi-VN');
 });
 
 var indexRouter = require('./components/index/indexRoute');
