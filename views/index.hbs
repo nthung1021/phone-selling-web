@@ -52,7 +52,7 @@ class="container mx-auto my-8 flex flex-col justify-center gap-3 lg:flex-row"
         <div class="ml-6 flex flex-col justify-center">
         <h3 class="text-left text-xs font-bold lg:text-sm">Free Delivery</h3>
         <p class="text-light text-center text-xs lg:text-left lg:text-sm">
-            Orders from $200
+            Orders from 20M
         </p>
         </div>
     </div>
@@ -330,14 +330,22 @@ class="container mx-auto my-8 flex flex-col justify-center gap-3 lg:flex-row"
         <div>
             <p class="mt-2">{{this.name}}</p>
             {{#if this.discountedPrice}}
-            <p class="font-medium text-violet-900">
-            {{this.discountedPrice}}VND
-            <span class="text-sm text-gray-500 line-through">{{this.price}}VND</span>
-            </p>
+            <div>
+                
+                <span class="font-medium text-violet-900">
+                    <span class="three-digit">{{this.discountedPrice}}</span>
+                    <span>VND</span>
+                </span>
+                <span class="text-sm text-gray-500 line-through">
+                    <span class="three-digit">{{this.price}}</span>
+                    <span>VND</span>
+                </span>
+            </div>
             {{else}} 
-            <p class="font-medium text-violet-900">
-            {{this.price}}VND
-            </p>
+            <div class="font-medium text-violet-900">
+                <span class="three-digit">{{this.price}}</span>
+                <span>VND</span>
+            </div>
             {{/if}}
             <div class="flex items-center">
             <svg
