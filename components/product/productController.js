@@ -100,6 +100,22 @@ const getFilteredProducts = async (req, res) => {
         delete filters.page;
         delete filters.sort;
 
+        // Update price ranges
+        const priceRanges = {
+            "0-5.000.000": [0, 5000000],
+            "5.000.000-10.000.000": [5000000, 10000000],
+            "10.000.000-20.000.000": [10000000, 20000000],
+            "20.000.000-50.000.000": [20000000, 50000000],
+            "50.000.000+": [50000000, Infinity]
+        };
+
+        if (filters.price) {
+            filters.price = Array.isArray(filters.price) ? filters.price : [filters.price];
+            filters.price = filters.price.map(priceRange => {
+                return priceRanges[priceRange] || null;
+            }).filter(Boolean); // Loại bỏ giá trị null nếu không tìm thấy giá trị phù hợp
+        }
+
         const data = await getProductsByFilters(filters, page, sortOrder);
         const products = data.products;
         const totalPages = data.totalPages;

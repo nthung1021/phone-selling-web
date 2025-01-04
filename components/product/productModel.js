@@ -137,7 +137,7 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
     // Map filters to Prisma `where` clause (case-insensitive)
     Object.keys(filters).forEach((key) => {
         const values = Array.isArray(filters[key]) ? filters[key] : [filters[key]];
-        if (key !== 'page' && key !== 'pageSize') {
+        if (key !== 'page' && key !== 'pageSize' && key !== 'price') {
             if (whereClause[key]) {
                 whereClause[key].OR = values.map(value => {
                     if (typeof value === 'string') {
@@ -160,6 +160,28 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
             }
         }
     });
+
+    // Add price filter conditions for multiple price ranges
+    if (filters.price && Array.isArray(filters.price)) {
+        const priceConditions = filters.price.map(priceRange => {
+            const [minPrice, maxPrice] = priceRange;
+            if (maxPrice === Infinity) {
+                return { price: { gte: parseFloat(minPrice) } };
+            } else {
+                return {
+                    price: {
+                        gte: parseFloat(minPrice),
+                        lte: parseFloat(maxPrice)
+                    }
+                };
+            }
+        });
+
+        whereClause.AND = whereClause.AND || [];
+        whereClause.AND.push({
+            OR: priceConditions  // Use OR for price conditions
+        });
+    }
 
     // Calculate pagination
     const skip = (page - 1) * pageSize;

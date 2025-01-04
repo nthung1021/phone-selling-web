@@ -74,11 +74,12 @@
 
         {{#if product.promotion}}
         <p class="mt-4 text-4xl font-bold text-violet-900">
-            {{disPrice}}VND <span class="text-xs text-gray-400 line-through">{{product.price}}VND</span>
+            {{formatPrice disPrice}}VND <span class="text-xs text-gray-400 line-through">{{formatPrice
+                product.price}}VND</span>
         </p>
         {{else}}
         <p class="mt-4 text-4xl font-bold text-violet-900">
-            {{product.price}}VND
+            {{formatPrice product.price}}VND
         </p>
         {{/if}}
 
@@ -211,12 +212,12 @@
             <p class="mt-2">{{this.name}}</p>
             {{#if this.promotion}}
             <p class="font-medium text-violet-900">
-                {{this.discountedPrice}}VND
-                <span class="text-sm text-gray-500 line-through">{{this.price}}VND</span>
+                {{formatPrice this.discountedPrice}}VND
+                <span class="text-sm text-gray-500 line-through">{{formatPrice this.price}}VND</span>
             </p>
             {{else}}
             <p class="font-medium text-violet-900">
-                {{this.price}}VND
+                {{formatPrice this.price}}VND
             </p>
             {{/if}}
 

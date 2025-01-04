@@ -173,6 +173,7 @@
 
         // Initialize menu data
         const menuData = {
+            "Price": ["0-5.000.000", "5.000.000-10.000.000", "10.000.000-20.000.000", "20.000.000-50.000.000", "50.000.000+"],
             "Brand": ["Apple", "Samsung", "Oppo", "Xiaomi", "Nubia"],
             "Chipset": ["Snapdragon", "MediaTek Dimensity", "Apple", "Unisoc"],
             "OS": ["Android", "iOS", "Xiaomi HyperOS", "ColorOS", "One UI"],
@@ -192,6 +193,17 @@
             // Clear existing content
             filterContainer.innerHTML = "";
 
+            // Thêm lớp Tailwind để tạo dạng grid, mặc định 2 cột, sẽ chuyển thành 1 cột trên màn hình nhỏ hơn lg
+            filterContainer.classList.add(
+                'grid',
+                'grid-cols-2',
+                'gap-4',
+                'lg:grid-cols-1',
+                'lg:overflow-y-visible',  // Tắt cuộn khi màn hình lớn
+                'overflow-y-auto', // Bật cuộn khi màn hình nhỏ
+                'max-h-[calc(100vh-100px)]' // Chiều cao tối đa cho màn hình nhỏ
+            );
+
             // Generate filter options based on menuData
             Object.keys(menuData).forEach(category => {
                 const categoryDiv = document.createElement("div");
@@ -204,12 +216,12 @@
 
                 menuData[category].forEach(item => {
                     const checkbox = `
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="flex items-center">
-                            <input type="checkbox" name="${category}" value="${item}" style="margin-right: 0.5rem;" />
-                            ${item}
-                        </label>
-                    </div>`;
+            <div class="flex justify-between items-center mb-1">
+                <label class="flex items-center">
+                    <input type="checkbox" name="${category}" value="${item}" class="mr-2" />
+                    ${item}
+                </label>
+            </div>`;
                     categoryDiv.insertAdjacentHTML("beforeend", checkbox);
                 });
 
