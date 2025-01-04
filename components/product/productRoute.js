@@ -1,9 +1,9 @@
 var express = require('express');
-var { getProduct, showProductDetails, searchFilter } = require('./productController');
+var { getProduct, showProductDetails, getFilteredProducts } = require('./productController');
 var router = express.Router();
 
+router.get('/filter', getFilteredProducts);
 router.get('/:name', showProductDetails);
-router.post('/search-filter', searchFilter);
 router.get('/', getProduct);
 
 module.exports = router;

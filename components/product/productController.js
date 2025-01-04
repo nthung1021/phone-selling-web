@@ -1,4 +1,4 @@
-var { getDescriptionByProductName, getRelevantProducts, findProducts } = require('./productModel');
+var { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters } = require('./productModel');
 
 var getProduct_json = async (req, res) => {
     try {
@@ -88,22 +88,22 @@ var showProductDetails = async (req, res) => {
     try {
         var productName = req.params.name;
         var product = await getDescriptionByProductName(productName);
-        
+
         if (!product) {
             return res.status(400).render("error", { message: "Product not found" });
         }
 
         var disPrice = product.promotion
-        ? (product.price * (1 - product.promotion / 100))
-        : null;
+            ? (product.price * (1 - product.promotion / 100))
+            : null;
 
-        var relevantProducts = await getRelevantProducts(product.category, product.id);
+        var relevantProducts = await getRelevantProducts(product.brand, product.id);
 
         relevantProducts = relevantProducts.map(product => ({
             ...product,
             discountedPrice: product.promotion
-            ? (product.price * (1 - product.promotion / 100))
-            : null,
+                ? (product.price * (1 - product.promotion / 100))
+                : null,
         }));
 
         res.render('product-detail', { product, disPrice, relevantProducts });
@@ -113,4 +113,53 @@ var showProductDetails = async (req, res) => {
     }
 };
 
-module.exports = { getProduct_json, getProduct, showProductDetails, searchFilter };
+const getFilteredProducts = async (req, res) => {
+    try {
+        const filters = req.query;
+        const page = parseInt(filters.page, 10) || 1; // Get page number from query string, default to 1 if not provided
+        const sortOrder = filters.sort || ''; // Get sort order from query string, default to 'asc' if not provided
+
+        // Remove trailing characters like GB, Hz and convert to integers if they exist
+        if (filters.ram) filters.ram = parseInt(filters.ram.replace(/GB$/, ''), 10);
+        if (filters.storage) filters.disk = parseInt(filters.storage.replace(/GB$/, ''), 10);
+        if (filters['refresh rate']) filters.refreshRate = parseInt(filters['refresh rate'].replace(/Hz$/, ''), 10);
+        delete filters.storage;
+        delete filters['refresh rate'];
+        delete filters.page;
+        delete filters.sort;
+
+        // Update price ranges
+        const priceRanges = {
+            "0-5.000.000": [0, 5000000],
+            "5.000.000-10.000.000": [5000000, 10000000],
+            "10.000.000-20.000.000": [10000000, 20000000],
+            "20.000.000-50.000.000": [20000000, 50000000],
+            "50.000.000+": [50000000, Infinity]
+        };
+
+        if (filters.price) {
+            filters.price = Array.isArray(filters.price) ? filters.price : [filters.price];
+            filters.price = filters.price.map(priceRange => {
+                return priceRanges[priceRange] || null;
+            }).filter(Boolean); // Loại bỏ giá trị null nếu không tìm thấy giá trị phù hợp
+        }
+
+        const data = await getProductsByFilters(filters, page, sortOrder);
+        const products = data.products;
+        const totalPages = data.totalPages;
+
+        res.json({
+            success: true,
+            products,
+            totalPages
+        });
+    } catch (error) {
+        console.error('Error fetching filtered products:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+        });
+    }
+}
+
+module.exports = { getProduct_json, getProduct, showProductDetails, searchFilter, getFilteredProducts };

@@ -4,18 +4,18 @@ var prisma = new PrismaClient();
 var getDescriptionByProductName = async (productName) => {
     try {
         return await prisma.product.findUnique({
-          where: { lowercaseName: productName }
+            where: { lowercaseName: productName }
         });
-    }   catch (error) {
+    } catch (error) {
         console.error("Error fetching description by product name:", error);
         throw new Error("Database error while fetching product description");
     }
 };
 
-var getRelevantProducts = async (category, excludeProductId, limit = 4) => {
+var getRelevantProducts = async (brand, excludeProductId, limit = 4) => {
     return prisma.product.findMany({
         where: {
-            category: category, // Match the category
+            brand: brand, // Match the category
             NOT: { id: excludeProductId }, // Exclude the current product
         },
         take: limit, // Limit the results
@@ -65,12 +65,12 @@ const findProducts = async (searchQuery, filters, excludeProductId, currentPage,
                 MediaTek: ["Dimensity 9400", "Dimensity 7200 Ultra", "Dimensity 7300", "Dimensity 8300-Ultra", "Dimensity 6300"],
                 Unisoc: ["T820"]
             };
-        
+
             // Get all selected child values
             const selectedChildren = filters.chipset.filter(chipset =>
                 Object.values(childMapping).flat().includes(chipset)
             );
-        
+
             // Remove parent if corresponding child is selected
             const filteredChipsets = filters.chipset.filter(chipset => {
                 if (childMapping[chipset]) {
@@ -79,7 +79,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, currentPage,
                 }
                 return true;
             });
-        
+
             const chipsetConditions = filteredChipsets.flatMap(chipset => {
                 if (childMapping[chipset]) {
                     return childMapping[chipset].map(child => ({ chipset: child }));
@@ -87,7 +87,7 @@ const findProducts = async (searchQuery, filters, excludeProductId, currentPage,
                     return { chipset: chipset };
                 }
             });
-        
+
             whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...chipsetConditions] : chipsetConditions;
         }
 
@@ -132,5 +132,112 @@ const findProducts = async (searchQuery, filters, excludeProductId, currentPage,
     }
 };
 
+const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize = 9) => {
+    const whereClause = {};
 
-module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts };
+    // Map filters to Prisma `where` clause (case-insensitive)
+    Object.keys(filters).forEach((key) => {
+        const values = Array.isArray(filters[key]) ? filters[key] : [filters[key]];
+        if (key !== 'page' && key !== 'pageSize' && key !== 'price') {
+            if (whereClause[key]) {
+                whereClause[key].OR = values.map(value => {
+                    if (typeof value === 'string') {
+                        return { [key]: { contains: value, mode: 'insensitive' } };
+                    } else if (typeof value === 'number') {
+                        return { [key]: value };
+                    }
+                });
+            } else {
+                whereClause.AND = whereClause.AND || [];
+                whereClause.AND.push({
+                    OR: values.map(value => {
+                        if (typeof value === 'string') {
+                            return { [key]: { contains: value, mode: 'insensitive' } };
+                        } else if (typeof value === 'number') {
+                            return { [key]: value };
+                        }
+                    })
+                });
+            }
+        }
+    });
+
+    // Add price filter conditions for multiple price ranges
+    if (filters.price && Array.isArray(filters.price)) {
+        const priceConditions = filters.price.map(priceRange => {
+            const [minPrice, maxPrice] = priceRange;
+            if (maxPrice === Infinity) {
+                return { price: { gte: parseFloat(minPrice) } };
+            } else {
+                return {
+                    price: {
+                        gte: parseFloat(minPrice),
+                        lte: parseFloat(maxPrice)
+                    }
+                };
+            }
+        });
+
+        whereClause.AND = whereClause.AND || [];
+        whereClause.AND.push({
+            OR: priceConditions  // Use OR for price conditions
+        });
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * pageSize;
+
+    // Sort products based on the sortOrder
+    let orderBy = {};
+    if (sortOrder) {
+        if (sortOrder === "name-asc") {
+            orderBy = { name: 'asc' };
+        } else if (sortOrder === "name-desc") {
+            orderBy = { name: 'desc' };
+        } else if (sortOrder === "price-asc") {
+            orderBy = { price: 'asc' };
+        } else if (sortOrder === "price-desc") {
+            orderBy = { price: 'desc' };
+        }
+    }
+
+    // Fetch total count of products
+    const totalCount = await prisma.product.count({
+        where: whereClause,
+    });
+
+    // Calculate total pages
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    // Fetch products
+    const products = await prisma.product.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+            price: true,
+            promotion: true, // Fetch promotion to calculate discounted price
+            lowercaseName: true,
+        },
+        skip: skip,
+        take: pageSize,
+        orderBy: orderBy,
+    });
+
+    // Add discountedPrice field dynamically
+    const updatedProducts = products.map((product) => {
+        const discountedPrice = Math.round(product.price * (100 - (product.promotion || 0)) / 100);
+        return {
+            ...product,
+            discountedPrice,
+        };
+    });
+
+    return {
+        products: updatedProducts,
+        totalPages: totalPages,
+    };
+};
+
+module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters };
