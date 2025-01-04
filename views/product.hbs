@@ -271,12 +271,21 @@
             }
         };
 
-        // Thay đổi URL khi filter
         const changeUrlWithFilters = (filters, page, sortOrder) => {
+            // Build the query string from filters
             const query = Object.keys(filters)
                 .map((key) => filters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
                 .join("&");
-            const newUrl = `${window.location.pathname}?page=${page}&${query}&sort=${sortOrder}`;
+
+            // Initialize the new URL with the page and filter parameters
+            let newUrl = `${window.location.pathname}?page=${page}&${query}`;
+
+            // Add the sort parameter only if it's not "Default"
+            if (sortOrder && sortOrder !== "Default") {
+                newUrl += `&sort=${encodeURIComponent(sortOrder)}`;
+            }
+
+            // Update the browser URL without reloading the page
             window.history.pushState({ path: newUrl }, '', newUrl);
         };
 
@@ -290,6 +299,23 @@
 
             paginationContainer.innerHTML = "";
 
+            // Create and add 'Previous' button
+            const prevButton = document.createElement("button");
+            prevButton.textContent = "Previous";
+            prevButton.classList.add("px-3", "py-1", "border", "mx-1", "rounded");
+            if (currentPage === 1) {
+                prevButton.disabled = true;
+                prevButton.classList.add("bg-gray-300", "text-gray-500");
+            } else {
+                prevButton.classList.add("bg-white", "text-violet-900");
+                prevButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    applyFilters(currentPage - 1); // Go to previous page
+                });
+            }
+            paginationContainer.appendChild(prevButton);
+
+            // Create page number buttons
             for (let i = 1; i <= totalPages; i++) {
                 const pageButton = document.createElement("button");
                 pageButton.textContent = i;
@@ -299,12 +325,28 @@
                 } else {
                     pageButton.classList.add("bg-white", "text-violet-900");
                     pageButton.addEventListener("click", (event) => {
-                        event.preventDefault(); // Prevent default action
-                        applyFilters(i); // Pass the correct page number to applyFilters
+                        event.preventDefault();
+                        applyFilters(i); // Go to the selected page
                     });
                 }
                 paginationContainer.appendChild(pageButton);
             }
+
+            // Create and add 'Next' button
+            const nextButton = document.createElement("button");
+            nextButton.textContent = "Next";
+            nextButton.classList.add("px-3", "py-1", "border", "mx-1", "rounded");
+            if (currentPage === totalPages) {
+                nextButton.disabled = true;
+                nextButton.classList.add("bg-gray-300", "text-gray-500");
+            } else {
+                nextButton.classList.add("bg-white", "text-violet-900");
+                nextButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    applyFilters(currentPage + 1); // Go to next page
+                });
+            }
+            paginationContainer.appendChild(nextButton);
         };
 
         const updateProductList = (products) => {
