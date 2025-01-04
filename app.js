@@ -15,11 +15,16 @@ var hbs = require('hbs');
 hbs.registerHelper('formatName', function(name) {
     return name.toLowerCase().replace(/ /g, '-');
 });
+hbs.registerHelper('multiply', (price, quantity) => {
+    return (price * quantity);
+});
 
 var indexRouter = require('./components/index/indexRoute');
 var productRouter = require('./components/product/productRoute');
 var usersRouter = require('./components/users/usersRoute');
-var apiRouter = require('./components/product/apiRoute')
+var apiRouter = require('./components/product/apiRoute');
+var cartRouter = require('./components/cart/cartRoute');
+var orderRouter = require("./components/order/orderRoute");
 
 var app = express();
 
@@ -52,12 +57,14 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use('/', indexRouter);
 app.use('/home', indexRouter);
 app.use('/product', productRouter);
 app.use('/detail', productRouter);
 app.use('/users', usersRouter);
 app.use('/api', apiRouter);
+app.use('/cart', cartRouter);
+app.use('/order', orderRouter);
+app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
