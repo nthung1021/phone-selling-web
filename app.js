@@ -25,9 +25,12 @@ hbs.registerHelper('formatName', function (name) {
 //     return result;
 // });
 
-// hbs.registerHelper('lte', function (a, b) {
-//     return a <= b;
-// });
+hbs.registerHelper('lt', function (a, b) {
+    return a < b;
+});
+hbs.registerHelper('gt', function (a, b) {
+    return a > b;
+});
 
 var indexRouter = require('./components/index/indexRoute');
 var productRouter = require('./components/product/productRoute');

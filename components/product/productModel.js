@@ -12,10 +12,10 @@ var getDescriptionByProductName = async (productName) => {
     }
 };
 
-var getRelevantProducts = async (category, excludeProductId, limit = 4) => {
+var getRelevantProducts = async (brand, excludeProductId, limit = 4) => {
     return prisma.product.findMany({
         where: {
-            category: category, // Match the category
+            brand: brand, // Match the category
             NOT: { id: excludeProductId }, // Exclude the current product
         },
         take: limit, // Limit the results

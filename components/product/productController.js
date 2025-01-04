@@ -69,7 +69,7 @@ var showProductDetails = async (req, res) => {
             ? (product.price * (1 - product.promotion / 100))
             : null;
 
-        var relevantProducts = await getRelevantProducts(product.category, product.id);
+        var relevantProducts = await getRelevantProducts(product.brand, product.id);
 
         relevantProducts = relevantProducts.map(product => ({
             ...product,
