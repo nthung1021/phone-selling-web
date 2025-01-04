@@ -1,12 +1,12 @@
 const {
-    createOrder,
+    createOrders,
     getOrdersByUserId,
     clearCartAfterOrder,
     getOrderDetailByOrderId
 } = require('./orderModel');
 
 const { getCartItems } = require('../cart/cartModel'); // Import the function to fetch cart items
-  
+
 const createOrder = async (req, res) => {
     const {
         name,
@@ -55,7 +55,7 @@ const createOrder = async (req, res) => {
         res.status(500).send("Internal server error");
     }
 };
-  
+
 const formatDate = (date) => {
     const options = {
         year: "numeric",
@@ -133,7 +133,7 @@ const getCheckout = async (req, res) => {
 };
 
 const getConfirmation = async (req, res) => {
-    res.render("checkout-confirmation", {title: "Confirmation", user: req.user});
+    res.render("checkout-confirmation", { title: "Confirmation", user: req.user });
 };
 
 const calculateShippingFee = (deliveryMethod) => {
@@ -196,7 +196,7 @@ const getOrderDetails = async (req, res) => {
             user: req.user,
             order: {
                 ...order,
-                maskedCardNumber, 
+                maskedCardNumber,
                 subtotal,
                 formattedDate: formatDate(order.createdAt), // Add formatted date
             },
@@ -226,4 +226,3 @@ module.exports = {
     getOrderDetails,
 };
 
-  

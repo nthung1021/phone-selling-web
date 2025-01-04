@@ -44,7 +44,7 @@ const updateCartItemQuantity = async (id, quantity) => {
     });
 };
 
-const deleteCartItem = async (id) => {
+const deleteCartItems = async (id) => {
     return await prisma.cart.delete({ where: { id } });
 };
 
@@ -52,5 +52,5 @@ module.exports = {
     addOrUpdateCartItem,
     getCartItems,
     updateCartItemQuantity,
-    deleteCartItem
+    deleteCartItems
 };

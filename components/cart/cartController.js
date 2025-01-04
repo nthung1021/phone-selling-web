@@ -2,7 +2,7 @@ const {
     addOrUpdateCartItem,
     getCartItems,
     updateCartItemQuantity,
-    deleteCartItem
+    deleteCartItems
 } = require('./cartModel');
 
 const addToCart = async (req, res) => {

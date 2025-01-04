@@ -6,6 +6,6 @@ router.post("/create", createOrder);
 router.get("/history", getUserOrders);
 router.get("/checkout", getCheckout);
 router.get("/confirmation", getConfirmation);
-router.get("/:orderId", getOrderDetails);   
+router.get("/:orderId", getOrderDetails);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-const createOrder = async (userId, sessionId, cartItems, deliveryMethod, data) => {
+const createOrders = async (userId, sessionId, cartItems, deliveryMethod, data) => {
     return await prisma.order.create({
         data: {
             user: userId ? { connect: { id: userId } } : undefined, // Use `connect` for the user relation
@@ -26,7 +26,7 @@ const createOrder = async (userId, sessionId, cartItems, deliveryMethod, data) =
         },
     });
 };
-  
+
 
 const getOrdersByUserId = async (userId) => {
     return await prisma.order.findMany({
@@ -41,7 +41,7 @@ const getOrdersByUserId = async (userId) => {
 const clearCartAfterOrder = async (userId, sessionId) => {
     return await prisma.cart.deleteMany({
         where: {
-        OR: [{ userId }, { sessionId }],
+            OR: [{ userId }, { sessionId }],
         },
     });
 };
@@ -60,7 +60,7 @@ const getOrderDetailByOrderId = async (orderId) => {
 }
 
 module.exports = {
-    createOrder,
+    createOrders,
     getOrdersByUserId,
     clearCartAfterOrder,
     getOrderDetailByOrderId
