@@ -102,12 +102,22 @@
         </p>
 
         {{#if product.promotion}}
-        <p class="mt-4 text-4xl font-bold text-violet-900">
-            {{disPrice}}VND <span class="text-xs text-gray-400 line-through">{{product.price}}VND</span>
+        <p>
+            <span class="mt-4 text-4xl font-bold text-violet-900">
+                <span class="three-digit">{{disPrice}}</span>
+                VND 
+            <span>
+            <span class="text-xs text-gray-400 line-through">
+                <span class="three-digit">{{product.price}}</span> 
+                VND
+            </span>
         </p>
         {{else}}
-        <p class="mt-4 text-4xl font-bold text-violet-900">
-            {{product.price}}VND
+        <p>
+            <span class="mt-4 text-4xl font-bold text-violet-900">
+                <span class="three-digit">{{product.price}}</span>
+                VND 
+            <span>
         </p>
         {{/if}}
 
@@ -287,14 +297,21 @@
         <div>
         <p class="mt-2">{{this.name}}</p>
         {{#if this.promotion}}
-        <p class="font-medium text-violet-900">
-            {{this.discountedPrice}}VND
-            <span class="text-sm text-gray-500 line-through">{{this.price}}VND</span>
-        </p>
-        {{else}}
-        <p class="font-medium text-violet-900">
-            {{this.price}}VND
-        </p>    
+        <div>             
+            <span class="font-medium text-violet-900">
+                <span class="three-digit">{{this.discountedPrice}}</span>
+                <span>VND</span>
+            </span>
+            <span class="text-sm text-gray-500 line-through">
+                <span class="three-digit">{{this.price}}</span>
+                <span>VND</span>
+            </span>
+        </div>
+        {{else}} 
+        <div class="font-medium text-violet-900">
+            <span class="three-digit">{{this.price}}</span>
+            <span>VND</span>
+        </div>
         {{/if}}
 
         <div class="flex items-center">
