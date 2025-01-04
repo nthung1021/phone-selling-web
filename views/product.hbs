@@ -117,7 +117,7 @@
         </div>
 
         <!-- Pagination Search-->
-        <nav class="justify bg-center">
+        <nav class="flex justify-center bg-center" id="pagination-search">
             <ul class="inline-flex -space-x-px text-sm">
                 <li>
                     <a href="#" data-page="previous"
@@ -143,6 +143,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const paginationSearch = document.getElementById("pagination-search");
         const paginationLinks = document.querySelectorAll(".pagination-link");
 
         paginationLinks.forEach(link => {
@@ -343,6 +344,7 @@
                     updateProductList(data.products); // Cập nhật UI với danh sách sản phẩm lọc được
                     changeUrlWithFilters(selectedFilters, page, sortOrder); // Cập nhật URL với bộ lọc đã chọn
                     updatePagination(data.totalPages, page); // Cập nhật pagination
+                    paginationSearch.style.display = "none";
                 } else {
                     console.error("Error fetching products:", data.message);
                 }
@@ -493,5 +495,14 @@
 
         // Call the function to generate filter options
         generateFilterOptions();
+        const urlParams = new URLSearchParams(window.location.search);
+
+        if (!urlParams.has('q')) {
+            applyFilters(1); // Apply filters with default sorting
+            paginationSearch.style.display = "none";
+        } else {
+            paginationSearch.classList.add("flex", "justify-center");
+            paginationSearch.style.display = "block";
+        }
     });
 </script>
