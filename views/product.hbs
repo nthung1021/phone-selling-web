@@ -216,7 +216,7 @@
                 </div>
 
                 <div>
-                    <button class="my-5 h-10 w-full bg-violet-900 text-white">
+                    <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn">
                     Add to cart
                     </button>
                 </div>
@@ -347,7 +347,60 @@
     });
 </script>
 
-<script>
+<script> 
+    // Function to display products
+    function displayProducts(products) {
+        const productContainer = document.getElementById('product-list');
+        productContainer.innerHTML = '';
+
+        products.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'bg-white rounded-lg shadow-2xl p-4 text-center';
+            productElement.onclick = () => window.location.href = `/detail/${formatName(product.name)}`;
+
+            productElement.innerHTML = `
+            <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="${product.imageUrl}" alt="${product.name}" >
+            <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">${product.name}</h2>
+            <p class="text-xl text-[#BD8256] mb-4 cursor-pointer">£${product.price}</p>
+            <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
+        `;
+
+            productContainer.appendChild(productElement);
+        });
+    }
+
+    function formatName(name) {
+        return name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const productId = parseInt(event.target.dataset.productId, 10); // Convert to integer
+                const quantity = 1; // Default quantity
+
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productId, quantity }),
+                    });
+
+                    if (response.ok) {
+                        alert('Product added to cart!');
+                    } else {
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error adding product to cart:', error);
+                    alert('Something went wrong. Please try again later.');
+                }
+            });
+        });
+    });
+    
     document.getElementById('form').addEventListener('submit', handleFormSubmit);
     document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
 
@@ -388,30 +441,4 @@
             console.error('Error fetching products:', error);
         }
     };
-
-    // Function to display products
-    function displayProducts(products) {
-        const productContainer = document.getElementById('product-list');
-        productContainer.innerHTML = '';
-
-        products.forEach(product => {
-            const productElement = document.createElement('div');
-            productElement.className = 'bg-white rounded-lg shadow-2xl p-4 text-center';
-            productElement.onclick = () => window.location.href = `/detail/${formatName(product.name)}`;
-
-            productElement.innerHTML = `
-            <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="${product.imageUrl}" alt="${product.name}" >
-            <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">${product.name}</h2>
-            <p class="text-xl text-[#BD8256] mb-4 cursor-pointer">£${product.price}</p>
-            <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
-        `;
-
-            productContainer.appendChild(productElement);
-        });
-    }
-
-    function formatName(name) {
-        return name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-    }
-
 </script>
