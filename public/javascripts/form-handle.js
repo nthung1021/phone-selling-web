@@ -35,7 +35,7 @@ document.getElementById('form').addEventListener('submit', async (event) => {
 // Function to display products
 function displayProducts(products) {
     const productContainer = document.getElementById('product-list');
-    productContainer.innerHTML = '';        
+    productContainer.innerHTML = '';
 
     products.forEach(product => {
         const productElement = document.createElement('div');

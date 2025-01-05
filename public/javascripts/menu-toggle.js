@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        
+
         // Đảo ngược trạng thái hiển thị menu
         isMenuVisible = !isMenuVisible;
 
         // Cuộn trang xuống một khoảng sau khi click vào icon
         smoothScroll(240);
-    });         
+    });
 
     function smoothScroll(targetPosition) {
         const startPosition = window.pageYOffset;

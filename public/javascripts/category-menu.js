@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
-                checkbox.name =  + category;
+                checkbox.name = + category;
                 checkbox.value = item;
                 checkbox.style.marginRight = "0.5rem";
 
