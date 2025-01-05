@@ -17,7 +17,7 @@ var postLogin = (req, res, next) => {
       return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
     }
     if (!user.status) {
-      return res.render('login', { error: 'Your account is inactive. Please contact support.', layout: 'main' });
+      return res.render('login', { error: 'Your account is inactive. Please contact support.', title: 'Login' });
     }
     req.logIn(user, (err) => {
       if (err) {
