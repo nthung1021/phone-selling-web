@@ -1,5 +1,5 @@
 const {
-    createOrder,
+    addOrder,
     getOrdersByUserId,
     clearCartAfterOrder,
     getOrderDetailByOrderId
@@ -34,7 +34,7 @@ const createOrder = async (req, res) => {
         console.log("Subtotal:", subtotal);
         console.log("Total Amount:", totalAmount);
 
-        await createOrder(userId, sessionId, cartItems, deliveryMethod, {
+        await addOrder(userId, sessionId, cartItems, deliveryMethod, {
             name,
             email,
             address,
@@ -225,5 +225,3 @@ module.exports = {
     getConfirmation,
     getOrderDetails,
 };
-
-  
