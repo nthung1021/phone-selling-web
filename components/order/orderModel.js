@@ -26,7 +26,7 @@ const addOrder = async (userId, sessionId, cartItems, deliveryMethod, data) => {
         },
     });
 };
-  
+
 
 const getOrdersByUserId = async (userId) => {
     return await prisma.order.findMany({
@@ -41,7 +41,7 @@ const getOrdersByUserId = async (userId) => {
 const clearCartAfterOrder = async (userId, sessionId) => {
     return await prisma.cart.deleteMany({
         where: {
-        OR: [{ userId }, { sessionId }],
+            OR: [{ userId }, { sessionId }],
         },
     });
 };
