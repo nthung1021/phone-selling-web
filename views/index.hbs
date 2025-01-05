@@ -416,7 +416,7 @@ class="container mx-auto my-8 flex flex-col justify-center gap-3 lg:flex-row"
             </div>
 
             <div>
-            <button class="my-5 h-10 w-full bg-violet-900 text-white">
+            <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn" data-product-id={{this.id}}>
                 Add to cart
             </button>
             </div>
@@ -425,3 +425,32 @@ class="container mx-auto my-8 flex flex-col justify-center gap-3 lg:flex-row"
     {{/each}}
 </section>
 <!-- /Recommendations -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const productId = parseInt(event.target.dataset.productId, 10); // Convert to integer
+                const quantity = 1; // Default quantity
+
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productId, quantity }),
+                    });
+
+                    if (response.ok) {
+                        alert('Product added to cart!');
+                    } else {
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error adding product to cart:', error);
+                    alert('Something went wrong. Please try again later.');
+                }
+            });
+        });
+    });
+</script>
