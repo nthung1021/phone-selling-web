@@ -108,7 +108,8 @@
 
         <div class="mt-7 flex flex-row items-center gap-6">
             <button
-                class="flex h-12 w-1/3 items-center justify-center bg-violet-900 text-white duration-100 hover:bg-blue-800">
+                class="flex h-12 w-1/3 items-center justify-center bg-violet-900 text-white duration-100 hover:bg-blue-800 add-to-cart-btn"
+                data-product-id={{this.id}}>
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="mr-3 h-4 w-4">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -260,7 +261,8 @@
             </div>
 
             <div>
-                <button class="my-5 h-10 w-full bg-violet-900 text-white">
+
+                <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn" data-product-id={{this.id}}>
                     Add to cart
                 </button>
             </div>
@@ -270,3 +272,32 @@
 
 </section>
 <!-- /Product Details Page -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const productId = parseInt(event.target.dataset.productId, 10); // Convert to integer
+                const quantity = 1; // Default quantity
+
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productId, quantity }),
+                    });
+
+                    if (response.ok) {
+                        alert('Product added to cart!');
+                    } else {
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error adding product to cart:', error);
+                    alert('Something went wrong. Please try again later.');
+                }
+            });
+        });
+    });
+</script>

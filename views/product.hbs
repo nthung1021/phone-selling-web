@@ -104,41 +104,41 @@
                         <p class="text-sm text-gray-400">(150)</p>
                     </div>
 
+
                     <div>
-                        <button class="my-5 h-10 w-full bg-violet-900 text-white">
+                        <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn"
+                            data-product-id={{this.id}}>
                             Add to cart
                         </button>
                     </div>
                 </div>
                 {{/each}}
                 <!-- /Products -->
-
             </section>
+
+            <!-- Pagination Search-->
+            <nav class="flex justify-center bg-center" id="pagination-search">
+                <ul class="inline-flex -space-x-px text-sm">
+                    <li>
+                        <a href="#" data-page="previous"
+                            class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                            Previous</a>
+                    </li>
+
+                    <li>
+                        <a href="#" data-page="next"
+                            class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                            Next</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Pagination Filter -->
+            <div id="pagination-container" class="flex justify-center mt-10">
+                <!-- Pagination buttons will be dynamically generated here -->
+            </div>
+            <!-- /Pagination -->
         </div>
-
-        <!-- Pagination Search-->
-        <nav class="flex justify-center bg-center" id="pagination-search">
-            <ul class="inline-flex -space-x-px text-sm">
-                <li>
-                    <a href="#" data-page="previous"
-                        class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Previous</a>
-                </li>
-
-                <li>
-                    <a href="#" data-page="next"
-                        class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Next</a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Pagination Filter -->
-        <div id="pagination-container" class="flex justify-center mt-10">
-            <!-- Pagination buttons will be dynamically generated here -->
-        </div>
-        <!-- /Pagination -->
-    </div>
 </section>
 
 <script>
@@ -505,4 +505,100 @@
             paginationSearch.style.display = "block";
         }
     });
+</script>
+
+<script>
+    // Function to display products
+    function displayProducts(products) {
+        const productContainer = document.getElementById('product-list');
+        productContainer.innerHTML = '';
+
+        products.forEach(product => {
+            const productElement = document.createElement('div');
+            productElement.className = 'bg-white rounded-lg shadow-2xl p-4 text-center';
+            productElement.onclick = () => window.location.href = `/detail/${formatName(product.name)}`;
+
+            productElement.innerHTML = `
+            <img class="product-card mx-auto my-6 object-cover cursor-pointer" src="${product.imageUrl}" alt="${product.name}" >
+            <h2 class="text-xl text-[#8c7a6b] m-3 cursor-pointer">${product.name}</h2>
+            <p class="text-xl text-[#BD8256] mb-4 cursor-pointer">£${product.price}</p>
+            <button class="bg-[#AC6F53] text-white py-3 px-16 rounded-3xl hover:bg-[#7a6c5b]">ADD TO CART</button>
+        `;
+
+            productContainer.appendChild(productElement);
+        });
+    }
+
+    function formatName(name) {
+        return name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', async (event) => {
+                const productId = parseInt(event.target.dataset.productId, 10); // Convert to integer
+                const quantity = 1; // Default quantity
+
+                try {
+                    const response = await fetch('/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productId, quantity }),
+                    });
+
+                    if (response.ok) {
+                        alert('Product added to cart!');
+                    } else {
+                        alert('Failed to add product to cart. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Error adding product to cart:', error);
+                    alert('Something went wrong. Please try again later.');
+                }
+            });
+        });
+    });
+
+    document.getElementById('form').addEventListener('submit', handleFormSubmit);
+    document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
+
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        // Collect selected filters
+        const selectedFilters = {};
+        document.querySelectorAll('.filter:checked').forEach(input => {
+            const filterType = input.dataset.filter;
+            const value = input.dataset.value;
+            if (!selectedFilters[filterType]) {
+                selectedFilters[filterType] = [];
+            }
+            selectedFilters[filterType].push(value);
+        });
+
+        //console.log('Selected Filters:', selectedFilters);
+        const searchQuery = document.getElementById('search-input').value || '';
+        const excludeProductId = null; // Set this if you need to exclude a specific product
+        const limit = 10; // Set the limit as needed
+
+        try {
+            const response = await fetch(`/product/search-filter?q=${encodeURIComponent(searchQuery)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filters: selectedFilters, excludeProductId, limit }),
+            });
+
+            if (response.ok) {
+                const products = await response.json();
+                displayProducts(products);
+            } else {
+                console.error('Failed to fetch products');
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
 </script>
