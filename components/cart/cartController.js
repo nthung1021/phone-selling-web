@@ -2,7 +2,7 @@ const {
     addOrUpdateCartItem,
     getCartItems,
     updateCartItemQuantity,
-    deleteCartItem
+    deleteCartItemById
 } = require('./cartModel');
 
 const addToCart = async (req, res) => {
@@ -77,7 +77,7 @@ const deleteCartItem = async (req, res) => {
     const { id } = req.params;
 
     try {
-        await deleteCartItem(parseInt(id));
+        await deleteCartItemById(parseInt(id));
         res.sendStatus(204);
     } catch (error) {
         console.error("Error deleting cart item:", error);
