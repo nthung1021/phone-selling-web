@@ -104,7 +104,6 @@
                         <p class="text-sm text-gray-400">(150)</p>
                     </div>
 
-
                     <div>
                         <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn"
                             data-product-id={{this.id}}>
@@ -114,31 +113,33 @@
                 </div>
                 {{/each}}
                 <!-- /Products -->
+
             </section>
-
-            <!-- Pagination Search-->
-            <nav class="flex justify-center bg-center" id="pagination-search">
-                <ul class="inline-flex -space-x-px text-sm">
-                    <li>
-                        <a href="#" data-page="previous"
-                            class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                            Previous</a>
-                    </li>
-
-                    <li>
-                        <a href="#" data-page="next"
-                            class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                            Next</a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Pagination Filter -->
-            <div id="pagination-container" class="flex justify-center mt-10">
-                <!-- Pagination buttons will be dynamically generated here -->
-            </div>
-            <!-- /Pagination -->
         </div>
+
+        <!-- Pagination Search-->
+        <nav class="flex justify-center bg-center" id="pagination-search">
+            <ul class="inline-flex -space-x-px text-sm">
+                <li>
+                    <a href="#" data-page="previous"
+                        class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        Previous</a>
+                </li>
+
+                <li>
+                    <a href="#" data-page="next"
+                        class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                        Next</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Pagination Filter -->
+        <div id="pagination-container" class="flex justify-center mt-10">
+            <!-- Pagination buttons will be dynamically generated here -->
+        </div>
+        <!-- /Pagination -->
+    </div>
 </section>
 
 <script>
@@ -486,10 +487,18 @@
                             <p class="text-sm text-gray-400">(150)</p>
                         </div>
                         <div>
-                            <button class="my-5 h-10 w-full bg-violet-900 text-white">Add to cart</button>
+                            <button class="my-5 h-10 w-full bg-violet-900 text-white add-to-cart-btn" data-product-id="${product.id}">Add to cart</button>
                         </div>
                     </div>`;
                 productContainer.insertAdjacentHTML("beforeend", productHTML);
+            });
+
+            // Gán lại sự kiện cho nút "Add to Cart"
+            document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
+                button.addEventListener("click", (event) => {
+                    const productId = event.target.dataset.productId;
+                    addToCart(productId); // Gọi hàm thêm sản phẩm vào giỏ hàng
+                });
             });
         };
 
