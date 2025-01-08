@@ -22,12 +22,12 @@ var createUser = async (username, email, hashedPassword) => {
     });
 };
 
-var addTokenAndExpire = async (email, resetToken, expires) => {
+var addTokenAndExpire = async (username, email, resetToken, expires) => {
     if (!email) {
         throw new Error('Email is required');
     }
     return prisma.user.update({
-        where: { email },
+        where: { email, username, googleId: null },
         data: {
             resetPasswordToken: resetToken,
             resetPasswordExpires: expires,
@@ -61,7 +61,7 @@ var updatePassword = async (userid, hashedPassword) => {
 }
 
 var findOrCreateGoogleUser = async (googleId, username, email) => {
-    let user = await prisma.user.findUnique({ where: { googleId } });
+    let user = await prisma.user.findFirst({ where: { googleId } });
     if (!user) {
         user = await prisma.user.create({
             data: {
