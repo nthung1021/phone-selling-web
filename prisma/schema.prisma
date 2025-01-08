@@ -16,6 +16,9 @@ model User {
   createdAt DateTime @default(now())
   status    Boolean  @default(true)
   role      String   @default("user")
+  resetPasswordToken    String?
+  resetPasswordExpires  DateTime?
+  googleId   String?  @unique
   Order     Order[]
 }
 
