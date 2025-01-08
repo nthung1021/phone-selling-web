@@ -117,23 +117,6 @@
             </section>
         </div>
 
-        <!-- Pagination Search-->
-        <nav class="flex justify-center bg-center" id="pagination-search">
-            <ul class="inline-flex -space-x-px text-sm">
-                <li>
-                    <a href="#" data-page="previous"
-                        class="pagination-link flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Previous</a>
-                </li>
-
-                <li>
-                    <a href="#" data-page="next"
-                        class="pagination-link flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
-                        Next</a>
-                </li>
-            </ul>
-        </nav>
-
         <!-- Pagination Filter -->
         <div id="pagination-container" class="flex justify-center mt-10">
             <!-- Pagination buttons will be dynamically generated here -->
@@ -144,64 +127,73 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const paginationSearch = document.getElementById("pagination-search");
-        const paginationLinks = document.querySelectorAll(".pagination-link");
+        // Initialize menu data
+        const menuData = {
+            "Price": ["0-5.000.000", "5.000.000-10.000.000", "10.000.000-20.000.000", "20.000.000-50.000.000", "50.000.000+"],
+            "Brand": ["Apple", "Samsung", "Oppo", "Xiaomi", "Nubia"],
+            "Chipset": ["Snapdragon", "MediaTek Dimensity", "Apple", "Unisoc"],
+            "OS": ["Android", "iOS", "Xiaomi HyperOS", "ColorOS", "One UI"],
+            "RAM": ["4GB", "6GB", "8GB", "12GB", "16GB"],
+            "Storage": ["64GB", "128GB", "256GB", "512GB", "1024GB"],
+            "Refresh rate": ["60Hz", "90Hz", "120Hz", "144Hz"],
+        };
 
-        paginationLinks.forEach(link => {
-            link.addEventListener("click", function (event) {
-                event.preventDefault();
-
-                let currentPage = getCurrentPage();
-                let newPage = this.dataset.page === "next" ? currentPage + 1 : currentPage - 1;
-
-                if (newPage < 1) newPage = 1;
-
-                // Cập nhật URL
-                const newUrl = updateUrlWithPage(newPage);
-                window.history.pushState({ page: newPage }, "", newUrl);
-
-                // Gửi request AJAX để tải dữ liệu trang mới
-                fetchData(newPage);
-            });
-        });
-
-        // Hàm lấy số trang hiện tại từ URL
-        function getCurrentPage() {
-            const urlParams = new URLSearchParams(window.location.search);
-            let page = parseInt(urlParams.get('page')) || 1;
-            return page;
-        }
-
-        // Hàm tạo lại URL với tham số page mới
-        function updateUrlWithPage(page) {
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('page', page); // Cập nhật tham số page
-            return `${window.location.pathname}?${urlParams.toString()}`;
-        }
-
-        function apiToFetchData(page) {
-            const urlParams = new URLSearchParams(window.location.search);
-            urlParams.set('page', page); // Cập nhật tham số page
-            return `/api${window.location.pathname}?${urlParams.toString()}`;
-        }
-
-        // Hàm gửi request AJAX và cập nhật nội dung trang
-        function fetchData(page) {
-            const url = apiToFetchData(page);
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    updateProductList(data.products);
-                })
-                .catch(error => {
-                    console.error("Error fetching data:", error);
-                });
-        }
-
+        const paginationContainer = document.getElementById("pagination-container");
         // Initialize filter sidebar visibility toggle
         const filterSidebar = document.getElementById("filters-sidebar");
         const toggleFilters = document.getElementById("toggle-filters");
         const closeFilters = document.getElementById("close-filters");
+        // Initialize sort options dropdown visibility toggle
+        const sortButton = document.getElementById("sort-button");
+        const sortOptions = document.getElementById("sort-options");
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const searchInput = document.getElementById('search_input');
+        const nameValue = searchParams.get('name');
+
+        if (nameValue) {
+            searchInput.value = nameValue; // Đặt giá trị tìm kiếm vào input
+        }
+
+        // Gửi request AJAX với search, filter và pagination
+        const applyFilters = async (page = 1, sortOrder = "") => {
+            const selectedFilters = {};
+
+            // Thu thập các bộ lọc được chọn
+            document.querySelectorAll("#filter-container input[type='checkbox']:checked").forEach((checkbox) => {
+                const category = checkbox.name.toLowerCase();
+                const value = checkbox.value;
+
+                if (!selectedFilters[category]) {
+                    selectedFilters[category] = [];
+                }
+                selectedFilters[category].push(value);
+            });
+
+            // Build query string từ filter và pagination
+            const query = Object.keys(selectedFilters)
+                .map((key) => selectedFilters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
+                .join("&");
+
+            let newUrl = `/product/s?name=${nameValue}&${query}&page=${page}&sort=${sortOrder}`;
+            window.history.pushState({ path: newUrl }, "", newUrl);
+
+            const url = newUrl.replace('/product/s', '/product/search');
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("Failed to fetch products");
+
+                const data = await response.json();
+                if (data.success) {
+                    updateProductList(data.products); // Cập nhật danh sách sản phẩm
+                    updatePagination(data.totalPages, page); // Cập nhật pagination
+                } else {
+                    console.error("Error fetching products:", data.message);
+                }
+            } catch (error) {
+                console.error("Error applying filters:", error);
+            }
+        };
 
         // Hiển thị bộ lọc
         toggleFilters?.addEventListener("click", () => {
@@ -223,10 +215,7 @@
             }
         });
 
-        // Initialize sort options dropdown visibility toggle
-        const sortButton = document.getElementById("sort-button");
-        const sortOptions = document.getElementById("sort-options");
-
+        // Hiển thị dropdown sắp xếp
         sortButton.addEventListener("click", () => {
             sortOptions.classList.toggle("hidden");
             sortOptions.style.zIndex = 10; // Ensure the sort options dropdown is above other elements
@@ -241,17 +230,6 @@
                 sortOptions.classList.add("hidden"); // Hide sort options after selection
             });
         });
-
-        // Initialize menu data
-        const menuData = {
-            "Price": ["0-5.000.000", "5.000.000-10.000.000", "10.000.000-20.000.000", "20.000.000-50.000.000", "50.000.000+"],
-            "Brand": ["Apple", "Samsung", "Oppo", "Xiaomi", "Nubia"],
-            "Chipset": ["Snapdragon", "MediaTek Dimensity", "Apple", "Unisoc"],
-            "OS": ["Android", "iOS", "Xiaomi HyperOS", "ColorOS", "One UI"],
-            "RAM": ["4GB", "6GB", "8GB", "12GB", "16GB"],
-            "Storage": ["64GB", "128GB", "256GB", "512GB", "1024GB"],
-            "Refresh rate": ["60Hz", "90Hz", "120Hz", "144Hz"],
-        };
 
         // Function to generate filter options
         const generateFilterOptions = () => {
@@ -286,12 +264,12 @@
 
                 menuData[category].forEach(item => {
                     const checkbox = `
-            <div class="flex justify-between items-center mb-1">
-                <label class="flex items-center">
-                    <input type="checkbox" name="${category}" value="${item}" class="mr-2" />
-                    ${item}
-                </label>
-            </div>`;
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="${category}" value="${item}" class="mr-2" />
+                                ${item}
+                            </label>
+                        </div>`;
                     categoryDiv.insertAdjacentHTML("beforeend", checkbox);
                 });
 
@@ -306,80 +284,27 @@
             });
         };
 
-        const applyFilters = async (page = 1, sortOrder = "") => {
-            const selectedFilters = {};
-
-            document.querySelectorAll("#filter-container input[type='checkbox']:checked").forEach((checkbox) => {
-                const category = checkbox.name.toLowerCase(); // lấy tên bộ lọc (vd: Brand, RAM)
-                const value = checkbox.value;  // lấy giá trị được chọn
-
-                // Tạo array cho mỗi category nếu chưa có
-                if (!selectedFilters[category]) {
-                    selectedFilters[category] = [];
-                }
-
-                // Thêm giá trị đã chọn vào array
-                selectedFilters[category].push(value);
-            });
-
-            const query = Object.keys(selectedFilters)
-                .map((key) => selectedFilters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
-                .join("&");
-
-            try {
-                const response = await fetch(`/product/filter?page=${page}&${query}&sort=${sortOrder}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                if (!response.ok) {
-                    console.error("Error fetching data:", response.statusText);
-                    return;
-                }
-
-                const data = await response.json();
-
-                if (data.success) {
-                    updateProductList(data.products); // Cập nhật UI với danh sách sản phẩm lọc được
-                    changeUrlWithFilters(selectedFilters, page, sortOrder); // Cập nhật URL với bộ lọc đã chọn
-                    updatePagination(data.totalPages, page); // Cập nhật pagination
-                    paginationSearch.style.display = "none";
-                } else {
-                    console.error("Error fetching products:", data.message);
-                }
-            } catch (error) {
-                console.error("Error fetching filtered products:", error);
-            }
-        };
-
+        // Function to change URL with filters
         const changeUrlWithFilters = (filters, page, sortOrder) => {
             // Build the query string from filters
             const query = Object.keys(filters)
                 .map((key) => filters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
                 .join("&");
 
-            // Initialize the new URL with the page and filter parameters
-            let newUrl = `${window.location.pathname}?page=${page}&${query}`;
-
-            // Add the sort parameter only if it's not "Default"
-            if (sortOrder && sortOrder !== "Default") {
-                newUrl += `&sort=${encodeURIComponent(sortOrder)}`;
-            }
-
-            // Update the browser URL without reloading the page
-            window.history.pushState({ path: newUrl }, '', newUrl);
+            const newUrl = `/products?page=${page}&${query}&sort=${sortOrder}`;
+            window.history.pushState({ page, filters, sortOrder }, "", newUrl);
         };
+
+        // Lắng nghe sự kiện popstate để tải lại filter/pagination khi back/forward
+        window.addEventListener("popstate", (event) => {
+            if (event.state) {
+                const { page, filters, sortOrder } = event.state;
+                applyFilters(page, sortOrder);
+            }
+        });
 
         // Cập nhật pagination
         const updatePagination = (totalPages, currentPage) => {
-            const paginationContainer = document.getElementById("pagination-container");
-            if (!paginationContainer) {
-                console.error("Pagination container not found.");
-                return;
-            }
-
             paginationContainer.innerHTML = "";
 
             // Create and add 'Previous' button
@@ -392,7 +317,7 @@
             } else {
                 prevButton.classList.add("bg-white", "text-violet-900");
                 prevButton.addEventListener("click", (event) => {
-                    event.preventDefault();
+                    //event.preventDefault();
                     applyFilters(currentPage - 1); // Go to previous page
                 });
             }
@@ -408,7 +333,7 @@
                 } else {
                     pageButton.classList.add("bg-white", "text-violet-900");
                     pageButton.addEventListener("click", (event) => {
-                        event.preventDefault();
+                        //event.preventDefault();
                         applyFilters(i); // Go to the selected page
                     });
                 }
@@ -495,24 +420,34 @@
 
             // Gán lại sự kiện cho nút "Add to Cart"
             document.querySelectorAll(".add-to-cart-btn").forEach((button) => {
-                button.addEventListener("click", (event) => {
-                    const productId = event.target.dataset.productId;
-                    addToCart(productId); // Gọi hàm thêm sản phẩm vào giỏ hàng
+                button.addEventListener("click", async (event) => {
+                    const productId = parseInt(event.target.dataset.productId);
+                    //addToCart(productId); // Gọi hàm thêm sản phẩm vào giỏ hàng
+                    const quantity = 1;
+
+                    try {
+                        const response = await fetch('/cart/add', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ productId, quantity }),
+                        });
+
+                        if (response.ok) {
+                            alert('Product added to cart!');
+                            updateCartCount();
+                        } else {
+                            alert('Failed to add product to cart.');
+                        }
+                    } catch (error) {
+                        console.error('Error adding product to cart:', error);
+                        alert('Something went wrong.');
+                    }
                 });
             });
         };
 
-        // Call the function to generate filter options
-        generateFilterOptions();
-        const urlParams = new URLSearchParams(window.location.search);
-
-        if (!urlParams.has('q')) {
-            applyFilters(1); // Apply filters with default sorting
-            paginationSearch.style.display = "none";
-        } else {
-            paginationSearch.classList.add("flex", "justify-center");
-            paginationSearch.style.display = "block";
-        }
+        generateFilterOptions(); // Tạo bộ lọc ban đầu
+        updatePagination({{ totalPages }}, 1); // Cập nhật pagination ban đầu
     });
 </script>
 
@@ -570,44 +505,46 @@
         });
     });
 
-    document.getElementById('form').addEventListener('submit', handleFormSubmit);
-    document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
-
-
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-
-        // Collect selected filters
-        const selectedFilters = {};
-        document.querySelectorAll('.filter:checked').forEach(input => {
-            const filterType = input.dataset.filter;
-            const value = input.dataset.value;
-            if (!selectedFilters[filterType]) {
-                selectedFilters[filterType] = [];
-            }
-            selectedFilters[filterType].push(value);
-        });
-
-        //console.log('Selected Filters:', selectedFilters);
-        const searchQuery = document.getElementById('search-input').value || '';
-        const excludeProductId = null; // Set this if you need to exclude a specific product
-        const limit = 10; // Set the limit as needed
-
-        try {
-            const response = await fetch(`/product/search-filter?q=${encodeURIComponent(searchQuery)}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ filters: selectedFilters, excludeProductId, limit }),
-            });
-
-            if (response.ok) {
-                const products = await response.json();
-                displayProducts(products);
-            } else {
-                console.error('Failed to fetch products');
-            }
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    };
 </script>
+{{!--
+
+document.getElementById('form').addEventListener('submit', handleFormSubmit);
+document.getElementById('search-form').addEventListener('submit', handleFormSubmit);
+
+
+async function handleFormSubmit(event) {
+event.preventDefault();
+
+// Collect selected filters
+const selectedFilters = {};
+document.querySelectorAll('.filter:checked').forEach(input => {
+const filterType = input.dataset.filter;
+const value = input.dataset.value;
+if (!selectedFilters[filterType]) {
+selectedFilters[filterType] = [];
+}
+selectedFilters[filterType].push(value);
+});
+
+//console.log('Selected Filters:', selectedFilters);
+const searchQuery = document.getElementById('search-input').value || '';
+const excludeProductId = null; // Set this if you need to exclude a specific product
+const limit = 10; // Set the limit as needed
+
+try {
+const response = await fetch(`/product/search-filter?q=${encodeURIComponent(searchQuery)}`, {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ filters: selectedFilters, excludeProductId, limit }),
+});
+
+if (response.ok) {
+const products = await response.json();
+displayProducts(products);
+} else {
+console.error('Failed to fetch products');
+}
+} catch (error) {
+console.error('Error fetching products:', error);
+}
+}; --}}
