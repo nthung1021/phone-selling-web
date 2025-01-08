@@ -1,7 +1,8 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth20').Strategy;
 var bcrypt = require('bcrypt');
-var { findUserByUsername } = require('./usersModel');
+var {findUserByUsername, findOrCreateGoogleUser } = require('./usersModel');
 var { PrismaClient } = require('@prisma/client');
 var prisma = new PrismaClient();
 
@@ -53,5 +54,20 @@ passport.deserializeUser(async (id, done) => {
         done(error);
     }
 });
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/users/auth/google/callback",
+}, async (token, tokenSecret, profile, done) => {
+    console.log('Google profile:', profile);
+    try {
+        const user = await findOrCreateGoogleUser(profile.id, profile.displayName, profile.emails[0].value);
+        return done(null, user);
+    } catch (error) {
+        console.error('Error during Google authentication:', error);
+        return done(error, null);
+    }
+}));
 
 module.exports = passport;
