@@ -18,7 +18,7 @@ model User {
   role      String   @default("user")
   resetPasswordToken    String?
   resetPasswordExpires  DateTime?
-  googleId   String?  @unique
+  googleId   String?
   Order     Order[]
 }
 
