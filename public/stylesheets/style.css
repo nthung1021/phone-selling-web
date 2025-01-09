@@ -924,9 +924,6 @@ video {
 .justify-around {
   justify-content: space-around;
 }
-.justify-items-start {
-  justify-items: start;
-}
 .gap-1 {
   gap: 0.25rem;
 }
@@ -1230,6 +1227,12 @@ video {
 }
 .font-normal {
   font-weight: 400;
+}
+.uppercase {
+  text-transform: uppercase;
+}
+.lowercase {
+  text-transform: lowercase;
 }
 .leading-5 {
   line-height: 1.25rem;
