@@ -31,15 +31,15 @@
             </button>
         </div>
 
-        <form method="get" action="/product" class="hidden h-9 w-2/5 items-center border md:flex">
+        <form method="get" action="/product/s" class="hidden h-9 w-2/5 items-center border md:flex">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                 stroke="currentColor" class="mx-3 h-4 w-4">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
 
-            <input class="hidden w-11/12 outline-none md:block" type="search" name="q" id="search_input"
-                placeholder="Search" />
+            <input class="hidden w-11/12 outline-none md:block" type="search" name="name" id="search_input"
+                placeholder="Search" value="{{name}}" />
 
             <button type="submit" class="ml-auto h-full bg-amber-400 px-4 hover:bg-yellow-300">
                 Search
@@ -69,7 +69,7 @@
                 <p class="text-xs">Cart</p>
             </a>
 
-            <a href="" class="relative flex cursor-pointer flex-col items-center justify-center">
+            <a href="/users/account-info" class="relative flex cursor-pointer flex-col items-center justify-center">
                 <span class="absolute bottom-[33px] right-1 flex h-2 w-2">
                     <span
                         class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
@@ -130,15 +130,15 @@
                 </a>
             </div>
 
-            <form method="get" class="my-4 mx-5 flex h-9 items-center border">
+            <form method="get" method="/product/s" class="my-4 mx-5 flex h-9 items-center border">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="mx-3 h-4 w-4">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
 
-                <input class="hidden w-11/12 outline-none md:block" type="search" placeholder="Search" name="q"
-                    id="search_input" />
+                <input class="hidden w-11/12 outline-none md:block" type="search" placeholder="Search" name="name"
+                    id="search_input" value="{{query.name}}" />
 
                 <button type="submit" class="ml-auto h-full bg-amber-400 px-4 hover:bg-yellow-300">
                     Search
@@ -178,7 +178,7 @@
             {{#if user}}
             <div class="ml-auto flex gap-4 px-5">
                 <a class="font-bold text-gray-400 duration-100 hover:text-yellow-400 hover:underline"
-                    href="">{{user.username}}</a>
+                    href="/users/account-info">{{user.username}}</a>
 
                 <span class="text-white">&#124;</span>
 
@@ -355,6 +355,7 @@
     </section>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="/javascripts/page.js"></script>
+
     {{!--
     <script src="/javascripts/category-menu.js"></script> --}}
     <script src="/javascripts/cart.js"></script>

@@ -21,7 +21,7 @@ model User {
   googleId   String?
   avatar    String?  @default("/img/default-avatar.png")
   Order     Order[]
-  Review    Review[]
+  Review   Review[]
 }
 
 model Product {
@@ -46,6 +46,7 @@ model Product {
   Cart                    Cart[]
   orderProducts           OrderProduct[]
   Review                  Review[]
+  images                  String[]
 }
 
 model Session {

@@ -21,22 +21,14 @@
         <span class="mx-2 text-gray-500">&gt;</span>
     </li>
 
-    <li class="text-gray-500">
-        <a href="/order/history">My Order History</a>
-    </li>
-
-    <li>
-        <span class="mx-2 text-gray-500">&gt;</span>
-    </li>
-
-    <li class="text-gray-500">Order Overview</li>
+    <li class="text-gray-500">Account</li>
     </ul>
 </nav>
 
 <section
-class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-row lg:py-10"
+class="container mx-auto w-full flex-grow max-w-[1200px] border-b py-5 lg:flex lg:flex-row lg:py-10"
 >
-    <!-- sidebar  -->
+
     <section class="hidden w-[300px] flex-shrink-0 px-4 lg:block">
         <div class="border-b py-5">
         <div class="flex items-center">
@@ -59,8 +51,8 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
             <div class="flex w-full">
             <div class="flex flex-col gap-2">
                 <a
-                href="/users/account-page"
-                class="flex items-center gap-2 font-medium"
+                href="/users/account-info.hbs"
+                class="flex items-center gap-2 font-medium text-violet-900"
                 >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -76,18 +68,17 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
                     d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z"
                     />
                 </svg>
-                Manage account</a
-                >
+                Manage account</a>
                 <a
                 href="/users/profile-information"
-                class="text-gray-500 duration-100 hover:text-yellow-400"
-                >Profile information</a
-                >
+                class="active:blue-900 text-gray-500 duration-100 hover:text-yellow-400"
+                >Profile information
+                </a>
                 <a
                 href="/users/change-password"
                 class="text-gray-500 duration-100 hover:text-yellow-400"
-                >Change password</a
-                >
+                >Change password
+                </a>
             </div>
             </div>
         </div>
@@ -98,7 +89,7 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
             <div class="flex flex-col gap-2">
             <a
                 href="/order/history"
-                class="flex items-center gap-2 font-medium text-violet-900"
+                class="flex items-center gap-2 font-medium active:text-violet-900"
             >
                 <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -126,7 +117,7 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
         <div class="flex w-full">
             <div class="flex flex-col gap-2">
             <a
-                href=""
+                href="payment-methods.html"
                 class="flex items-center gap-2 font-medium active:text-violet-900"
             >
                 <svg
@@ -154,7 +145,7 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
         <div class="flex w-full">
             <div class="flex flex-col gap-2">
             <a
-                href=""
+                href="wishlist.html"
                 class="flex items-center gap-2 font-medium active:text-violet-900"
             >
                 <svg
@@ -206,170 +197,58 @@ class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:flex lg:flex-
         </div>
         </div>
     </section>
-    <!-- /sidebar  -->
+<!-- /sidebar  -->
 
-    <!-- Mobile product table  -->
-    <section
-        class="container mx-auto my-3 flex w-full flex-col gap-3 px-4 md:hidden"
-    >
+<!-- option cards  -->
 
-        {{#each products}}
-        <div class="flex w-full border px-4 py-4">
-        <img
-            class="self-start object-contain"
-            width="90px"
-            src="{{this.product.imageUrl}}"
-            alt="{{this.product.name}}"
-        />
-        <div class="ml-3 flex w-full flex-col justify-center">
-            <div class="flex items-center justify-between">
-            <p class="text-xl font-bold">{{this.product.name}}</p>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                class="h-5 w-5"
-            >
-                <path
-                d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z"
-                />
-            </svg>
-            </div>
-            <p class="py-3 text-xl font-bold text-violet-900">
-                <span class="three-digit">{{this.totalPrice}}</span> 
-                VND
-            </p>
-            <div class="mt-2 flex w-full items-center justify-between">
-            <div class="flex items-center justify-center">
-                <div
-                class="flex cursor-text items-center justify-center active:ring-gray-500"
-                >
-                Quantity: {{this.quantity}}
-                </div>
-            </div>
-            </div>
-        </div>
-        </div>
-        {{/each}}
-
-    </section>
-    <!-- /Mobile product table  -->
-
-    <!-- Product table  -->
-    <section class="w-full max-w-[1200px] gap-3 px-5 pb-10">
-        <table class="hidden w-full md:table">
-        <thead class="h-16 bg-neutral-100">
-            <tr>
-            <th>ITEM</th>
-            <th>PRICE</th>
-            <th>QUANTITY</th>
-            <th>TOTAL</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            {{#each products}}
-            <tr class="h-[100px] border-b">
-            <td class="align-middle">
-                <div class="flex">
+    <div class="mb-5 flex items-center justify-between px-5 md:hidden">
+        <div class="flex gap-3">
+            <div class="py-5">
+                <div class="flex items-center">
                 <img
-                    class="w-[90px]"
-                    src="{{this.product.imageUrl}}"
-                    alt="{{this.product.name}}"
+                    width="40px"
+                    height="40px"
+                    class="rounded-full object-cover"
+                    src="{{user.avatar}}"
+                    alt="User Avatar"
                 />
-                <div class="ml-3 flex flex-col justify-center">
-                    <p class="text-xl font-bold">{{this.product.name}}</p>
+                <div class="ml-5">
+                    <p class="font-medium text-gray-500">Hello,</p>
+                    <p class="font-bold">{{user.username}}</p>
                 </div>
                 </div>
-            </td>
-            <td class="mx-auto text-center">
-                <span class="three-digit">{{this.discountedPrice}}</span>
-                VND
-            </td>
-            <td class="text-center align-middle">{{this.quantity}}</td>
-            <td class="mx-auto text-center">
-                <span class="three-digit">{{this.totalPrice}}</span>
-                VND
-            </td>
-            </tr>
-            {{/each}}
-
-        </tbody>
-        </table>
-        <!-- /Product table  -->
-
-        <!-- Summary  -->
-
-        <section class="my-5 flex w-full flex-col gap-4 lg:flex-row">
-        <div class="lg:w-1/2">
-            <div class="border py-5 px-4 shadow-md">
-            <p class="font-bold">ORDER SUMMARY</p>
-
-            <div class="flex justify-between border-b py-5">
-                <p>Subtotal</p>
-                <p>
-                    <span class="three-digit">{{order.subtotal}}</span>
-                    VND
-                </p>
-            </div>
-
-            <div class="flex justify-between border-b py-5">
-                <p>Shipping</p>
-                <p>
-                    <span class="three-digit">{{order.shippingFee}}</span>
-                    VND
-                </p>
-            </div>
-
-            <div class="flex justify-between py-5">
-                <p>Total</p>
-                <p>
-                    <span class="three-digit">{{order.totalAmount}}</span>
-                    VND
-                </p>
-            </div>
             </div>
         </div>
 
-        <!-- Address info  -->
+        <div class="flex gap-3">
+        <button class="border bg-amber-400 py-2 px-2">
+            Profile settings
+        </button>
+        </div>
+    </div>
 
-        <div class="lg:w-1/2">
-            <div class="border py-5 px-4 shadow-md">
-            <p class="font-bold">ORDER INFORMATION</p>
+    <section
+        class="grid w-full max-w-[1200px] grid-cols-1 gap-3 px-5 pb-10"
+    >
+        <div class="/users/personal-profile">
+            <div class="border py-5 shadow-md">
+                <div class="flex justify-between px-4 pb-5">
+                    <p class="font-bold">Personal Profile</p>
+                    <a
+                        class="text-sm text-violet-900"
+                        href=""
+                        >Edit</a
+                    >
+                    </div>
 
-            <div>
-                <p>Order &num;{{order.id}}</p>
-            </div>
-
-            <div class="flex flex-col border-b py-5">
-                <p>
-                Status:
-                <span class="font-bold text-yellow-500">{{order.orderStatus}}</span>
-                </p>
-
-                <p>Time: {{order.formattedDate}}</p>
-            </div>
-
-            <div></div>
-
-            <div class="flex flex-col border-b py-5">
-                <p class="font-bold">ADDRESS INFORMATION</p>
-                <p>Address: {{order.address}}</p>
-                <p>Email: {{order.email}}</p>
-            </div>
-
-            <div class="flex flex-col py-5">
-                <p class="font-bold">PAYMENT INFORMATION</p>
-                <p>Payment method: Credit Card</p>
-                <p>Card Holder: {{order.cardHolder}}</p>
-                <p>Card number: {{order.maskedCardNumber}}</p>
-            </div>
+                    <div class="px-4">
+                    <p>Name: {{user.username}}</p>
+                    <p>Email: {{user.email}}</p>
+                    <p>Phone: {{user.phone}}</p>
+                    <p>Create since: {{formatCreatedTime}}</p>
+                </div>
             </div>
         </div>
 
-        <!-- /Address info  -->
-        </section>
     </section>
-
-    <!-- /Summary -->
 </section>

@@ -22,147 +22,92 @@ var getRelevantProducts = async (brand, excludeProductId, limit = 4) => {
     });
 };
 
-const findProducts = async (searchQuery, filters, excludeProductId, currentPage, limit) => {
-    try {
-        const whereConditions = {};
+// Lấy danh sách sản phẩm 
+const getAllProducts = async (page = 1, pageSize = 9, sortOrder = "") => {
+    // Tính toán phân trang
+    const skip = Math.max((page - 1) * pageSize, 0);
 
-        // Add search query condition
-        if (searchQuery) {
-            whereConditions.OR = [
-                { name: { contains: searchQuery, mode: 'insensitive' } },
-                { brand: { contains: searchQuery, mode: 'insensitive' } },
-                { chipset: { contains: searchQuery, mode: 'insensitive' } },
-                { os: { contains: searchQuery, mode: 'insensitive' } },
-            ];
+    // Sắp xếp sản phẩm dựa trên sortOrder
+    let orderBy = {};
+    if (sortOrder) {
+        if (sortOrder === "name-asc") {
+            orderBy = { name: 'asc' };
+        } else if (sortOrder === "name-desc") {
+            orderBy = { name: 'desc' };
+        } else if (sortOrder === "price-asc") {
+            orderBy = { price: 'asc' };
+        } else if (sortOrder === "price-desc") {
+            orderBy = { price: 'desc' };
         }
-
-        // Add price filter conditions
-        if (filters.price && Array.isArray(filters.price)) {
-            const priceConditions = filters.price.map(p => {
-                const range = p.split('-');
-                if (range.length === 1) {
-                    if (p.startsWith('>')) {
-                        return { price: { gt: parseFloat(p.slice(1)) } };
-                    } else if (p.startsWith('<')) {
-                        return { price: { lt: parseFloat(p.slice(1)) } };
-                    }
-                } else {
-                    return { price: { gte: parseFloat(range[0]), lte: parseFloat(range[1]) } };
-                }
-            });
-            whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...priceConditions] : priceConditions;
-        }
-
-        // Add other filter conditions
-        if (filters.brand && filters.brand.length > 0) {
-            whereConditions.brand = { in: filters.brand };
-        }
-
-        if (filters.chipset && filters.chipset.length > 0) {
-            const childMapping = {
-                Apple: ["A18 Pro", "A17 Pro"],
-                Snapdragon: ["8 Gen 3", "8 Gen 3 For Galaxy", "8 Gen 2"],
-                MediaTek: ["Dimensity 9400", "Dimensity 7200 Ultra", "Dimensity 7300", "Dimensity 8300-Ultra", "Dimensity 6300"],
-                Unisoc: ["T820"]
-            };
-
-            // Get all selected child values
-            const selectedChildren = filters.chipset.filter(chipset =>
-                Object.values(childMapping).flat().includes(chipset)
-            );
-
-            // Remove parent if corresponding child is selected
-            const filteredChipsets = filters.chipset.filter(chipset => {
-                if (childMapping[chipset]) {
-                    // Remove parent if at least one child value is selected
-                    return !selectedChildren.some(child => childMapping[chipset].includes(child));
-                }
-                return true;
-            });
-
-            const chipsetConditions = filteredChipsets.flatMap(chipset => {
-                if (childMapping[chipset]) {
-                    return childMapping[chipset].map(child => ({ chipset: child }));
-                } else {
-                    return { chipset: chipset };
-                }
-            });
-
-            whereConditions.OR = whereConditions.OR ? [...whereConditions.OR, ...chipsetConditions] : chipsetConditions;
-        }
-
-        if (filters.os && filters.os.length > 0) {
-            whereConditions.os = { in: filters.os };
-        }
-
-        if (filters.ram && filters.ram.length > 0) {
-            whereConditions.ram = { in: filters.ram };
-        }
-
-        if (filters.disk && filters.disk.length > 0) {
-            whereConditions.disk = { in: filters.disk };
-        }
-
-        if (filters.screenSize && filters.screenSize.length > 0) {
-            whereConditions.screenSize = { in: filters.screenSize };
-        }
-
-        if (filters.refreshSize && filters.refreshSize.length > 0) {
-            whereConditions.refreshSize = { in: filters.refreshSize };
-        }
-
-        // Exclude specific product
-        if (excludeProductId) {
-            whereConditions.NOT = { id: excludeProductId };
-        }
-
-        //console.log('whereConditions:', whereConditions);
-
-        // Fetch products with the combined conditions
-        const products = await prisma.product.findMany({
-            where: whereConditions,
-            skip: (currentPage - 1) * limit,
-            take: limit,
-        });
-
-        return products;
-    } catch (error) {
-        console.error('Error finding products:', error);
-        throw error;
     }
+
+    // Đếm tổng số sản phẩm
+    const totalCount = await prisma.product.count();
+
+    // Tính tổng số trang
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    // Truy vấn danh sách sản phẩm
+    const products = await prisma.product.findMany({
+        select: {
+            id: true,
+            name: true,
+            imageUrl: true,
+            price: true,
+            promotion: true, // Để tính giá khuyến mãi
+        },
+        skip: skip,
+        take: pageSize,
+        orderBy: orderBy,
+    });
+
+    // Tính giá sau khuyến mãi
+    const updatedProducts = products.map((product) => {
+        const discountedPrice = Math.round(product.price * (100 - (product.promotion || 0)) / 100);
+        return {
+            ...product,
+            discountedPrice,
+        };
+    });
+
+    return {
+        products: updatedProducts,
+        totalPages: totalPages,
+    };
 };
 
-const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize = 9) => {
+// Lấy danh sách sản phẩm dựa trên tìm kiếm và bộ lọc
+const getProductsByFiltersAndSearch = async (searchQuery, filters, page = 1, sortOrder = "", pageSize = 9) => {
     const whereClause = {};
 
-    // Map filters to Prisma `where` clause (case-insensitive)
+    // Thêm điều kiện tìm kiếm (searchQuery)
+    if (searchQuery) {
+        whereClause.OR = [
+            { name: { contains: searchQuery, mode: 'insensitive' } },
+            { brand: { contains: searchQuery, mode: 'insensitive' } },
+            { chipset: { contains: searchQuery, mode: 'insensitive' } },
+            { os: { contains: searchQuery, mode: 'insensitive' } },
+        ];
+    }
+
+    // Thêm các điều kiện lọc từ filters
     Object.keys(filters).forEach((key) => {
         const values = Array.isArray(filters[key]) ? filters[key] : [filters[key]];
-        if (key !== 'page' && key !== 'pageSize' && key !== 'price') {
-            if (whereClause[key]) {
-                whereClause[key].OR = values.map(value => {
+        if (key !== 'price') {
+            whereClause.AND = whereClause.AND || [];
+            whereClause.AND.push({
+                OR: values.map(value => {
                     if (typeof value === 'string') {
                         return { [key]: { contains: value, mode: 'insensitive' } };
                     } else if (typeof value === 'number') {
                         return { [key]: value };
                     }
-                });
-            } else {
-                whereClause.AND = whereClause.AND || [];
-                whereClause.AND.push({
-                    OR: values.map(value => {
-                        if (typeof value === 'string') {
-                            return { [key]: { contains: value, mode: 'insensitive' } };
-                        } else if (typeof value === 'number') {
-                            return { [key]: value };
-                        }
-                    })
-                });
-            }
+                })
+            });
         }
     });
 
-    // Add price filter conditions for multiple price ranges
+    // Thêm điều kiện giá (price)
     if (filters.price && Array.isArray(filters.price)) {
         const priceConditions = filters.price.map(priceRange => {
             const [minPrice, maxPrice] = priceRange;
@@ -180,14 +125,14 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
 
         whereClause.AND = whereClause.AND || [];
         whereClause.AND.push({
-            OR: priceConditions  // Use OR for price conditions
+            OR: priceConditions
         });
     }
 
-    // Calculate pagination
-    const skip = (page - 1) * pageSize;
+    // Tính toán phân trang
+    const skip = Math.max((page - 1) * pageSize, 0);
 
-    // Sort products based on the sortOrder
+    // Sắp xếp sản phẩm dựa trên sortOrder
     let orderBy = {};
     if (sortOrder) {
         if (sortOrder === "name-asc") {
@@ -201,15 +146,15 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
         }
     }
 
-    // Fetch total count of products
+    // Đếm tổng số sản phẩm
     const totalCount = await prisma.product.count({
         where: whereClause,
     });
 
-    // Calculate total pages
+    // Tính tổng số trang
     const totalPages = Math.ceil(totalCount / pageSize);
 
-    // Fetch products
+    // Truy vấn danh sách sản phẩm
     const products = await prisma.product.findMany({
         where: whereClause,
         select: {
@@ -217,15 +162,14 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
             name: true,
             imageUrl: true,
             price: true,
-            promotion: true, // Fetch promotion to calculate discounted price
-            lowercaseName: true,
+            promotion: true, // Để tính giá khuyến mãi
         },
         skip: skip,
         take: pageSize,
         orderBy: orderBy,
     });
 
-    // Add discountedPrice field dynamically
+    // Tính giá sau khuyến mãi
     const updatedProducts = products.map((product) => {
         const discountedPrice = Math.round(product.price * (100 - (product.promotion || 0)) / 100);
         return {
@@ -262,4 +206,4 @@ const getProductIdByName = async (name) => {
     }
 };
 
-module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters, getProductIdByName };
+module.exports = { getDescriptionByProductName, getRelevantProducts, getProductsByFiltersAndSearch, getAllProducts, getProductIdByName };

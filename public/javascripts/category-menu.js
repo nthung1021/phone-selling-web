@@ -8,9 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "Refresh rate": ["60Hz", "90Hz", "120Hz", "144Hz"],
     };
 
+    const filterContainer = document.getElementById("menu-content");
+
     // Function to generate filter options
-    const generateFilterOptions = () => {
-        const filterContainer = document.getElementById("filter-container");
+    const generateFilter = () => {
         if (!filterContainer) {
             console.error("Filter container element not found.");
             return;
@@ -38,9 +39,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const checkbox = document.createElement("input");
                 checkbox.type = "checkbox";
-                checkbox.name = + category;
+                checkbox.name = category;
                 checkbox.value = item;
                 checkbox.style.marginRight = "0.5rem";
+
+                // Add event listener to redirect on selection
+                checkbox.addEventListener("change", () => searchFilter());
 
                 label.appendChild(checkbox);
                 label.appendChild(document.createTextNode(item));
@@ -53,8 +57,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
+    // Function to apply filter and redirect to product page
+    const searchFilter = () => {
+        const selectedFilters = {};
+
+        // Collect all selected filters
+        filterContainer.querySelectorAll("input[type='checkbox']:checked").forEach((checkbox) => {
+            const category = checkbox.name;
+            const value = checkbox.value;
+
+            if (!selectedFilters[category]) {
+                selectedFilters[category] = [];
+            }
+            selectedFilters[category].push(value);
+        });
+
+        // Build query string
+        const queryString = Object.keys(selectedFilters)
+            .map(category =>
+                selectedFilters[category]
+                    .map(value => `${encodeURIComponent(category)}=${encodeURIComponent(value)}`)
+                    .join("&")
+            )
+            .join("&");
+
+        // Redirect to product page with filter query
+        window.location.href = `/product?${queryString}`;
+    };
+
     // Generate filter options on page load
-    generateFilterOptions();
+    generateFilter();
 
     // Existing code for menu interaction
     document.querySelectorAll(".menu-item").forEach((item) => {

@@ -2,10 +2,16 @@
 <section class="container flex-grow mx-auto max-w-[1200px] border-b py-5 lg:grid lg:grid-cols-2 lg:py-10">
     <!-- image gallery -->
 
-    <div class="container mx-auto px-4">
-        <img class="w-full" src="{{product.imageUrl}}" alt="{{product.name}}" />
-
-
+    <div class="container mx-auto px-4 image-gallery">
+        <div class="main-image">
+            <img id="mainImage" src="{{product.images.[0]}}" alt="{{product.name}}">
+        </div>
+        <div class="thumbnail-gallery">
+            {{#each product.images}}
+            <img class="thumbnail" src="{{this}}" alt="Image of {{../product.name}}"
+                onclick="changeMainImage('{{this}}')">
+            {{/each}}
+        </div>
     </div>
     <!-- /Image gallery  -->
 
@@ -301,3 +307,11 @@
         });
     });
 </script>
+
+<script>
+    function changeMainImage(imageUrl) {
+        document.getElementById('mainImage').src = imageUrl;
+    }
+</script>
+
+<link rel="stylesheet" href="/stylesheets/image.css">
