@@ -35,6 +35,9 @@ hbs.registerHelper('gt', function (a, b) {
 hbs.registerHelper('formatPrice', function (price) {
     return price.toLocaleString('vi-VN');
 });
+hbs.registerHelper('json', function (context) {
+    return JSON.stringify(context);
+});
 
 var indexRouter = require('./components/index/indexRoute');
 var productRouter = require('./components/product/productRoute');
