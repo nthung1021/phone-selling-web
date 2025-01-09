@@ -1,9 +1,12 @@
 var express = require('express');
 var passport = require('passport');
+var upload = require('./cloudMiddleware')
 var { 
     getRegister, postRegister, getLogin, postLogin, getInfo,
     getLogout, ensureAuthenticated, checkAvailability, getForgotPassword,
-    postForgotPassword, getResetPassword, postResetPassword
+    postForgotPassword, getResetPassword, postResetPassword,
+    getAccountInfo, getChangePassword, postChangePassword,
+    getProfileInfo, postChangeInfo, postProfileImage
 } = require('./usersController');
 var router = express.Router();
 
@@ -24,6 +27,12 @@ router.post('/reset-password/:token', postResetPassword);
 router.get('/info', ensureAuthenticated, getInfo)
 router.get('/check-availability', checkAvailability);
 
+router.get('/account-info', ensureAuthenticated, getAccountInfo);
+
+router.get('/profile-information', ensureAuthenticated, getProfileInfo);
+router.post('/change-info', postChangeInfo);
+router.post('/upload-avatar', upload.single('avatar'), postProfileImage);
+
 router.get('/auth/google', passport.authenticate('google', {
     scope: ['profile', 'email']
 }));
@@ -34,5 +43,8 @@ router.get('/auth/google/callback',
         successRedirect: '/'
     })
 );
+
+router.get('/change-password', ensureAuthenticated, getChangePassword);
+router.post('/change-password', postChangePassword);
 
 module.exports = router;
