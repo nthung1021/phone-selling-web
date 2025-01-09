@@ -50,6 +50,11 @@ const postRegister = async (req, res) => {
         const existingUser = await findUserByUsername(username);
         const existingEmail = await findUserByEmail(email);
 
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+            return res.render('register', { error: passwordError, title: 'Register' });
+        }
+
         if (existingUser) {
           return res.render('register', { error: 'Username already exists', title: 'Register' });
         }
@@ -160,6 +165,11 @@ const postResetPassword = async (req, res) => {
         return res.render('reset-password', {title: 'Reset Password', error: 'Passwords do not match.', token});
     }
 
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        return res.render('reset-password', {error: passwordError, title: 'Reset Password'});
+    }
+
     try {
         const user = await findTokenAndExpire(token);
         if (!user) {
@@ -255,10 +265,15 @@ const postChangePassword = async (req, res) => {
             return res.render('change-password', {title: 'Change Password', error: 'Current password is incorrect'});
         }
 
+        const passwordError = validatePassword(newPassword);
+        if (passwordError) {
+            return res.render('change-pasword', { error: passwordError, title: 'Change Password' });
+        }
+
         if (newPassword !== confirmPassword) {
             return res.render('change-password', {title: 'Change Password', error: 'Confirm password must be the same as passwword'});
         }
-
+        
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         await updatePassword(req.user.id, hashedNewPassword);
         res.render('change-password', {title: 'Change Password', success: 'Password has been changed'});
@@ -342,6 +357,28 @@ const formatDate = (date) => {
     };
     return new Intl.DateTimeFormat("en-CA", options).format(new Date(date)).replace(/,/g, "").replace(/:/g, "-");
 };
+
+const validatePassword = (password) => {
+    const minLength = 10;
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+
+    if (password.length < minLength) {
+        return 'Password must be at least 10 characters long';
+    }
+    if (!hasUpperCase) {
+        return 'Password must contain at least one uppercase letter';
+    }
+    if (!hasLowerCase) {
+        return 'Password must contain at least one lowercase letter';
+    }
+    if (!hasNumber) {
+        return 'Password must contain at least one number';
+    }
+    return null;
+}
+
 
 module.exports = {
     getLogin, postLogin, getRegister, postRegister,
