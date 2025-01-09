@@ -104,7 +104,7 @@ model Review {
   username      String
   id_product    Int
   review        String
-  create_at    DateTime @default(now())
+  created_at    DateTime @default(now())
 
   product       Product   @relation(fields: [id_product], references: [id])
   user          User      @relation(fields: [username], references: [username])
