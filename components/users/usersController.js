@@ -1,53 +1,54 @@
-var bcrypt = require('bcrypt');
-var passport = require('./passportConfig');
-var nodemailer = require('nodemailer');
-var crypto = require('crypto');
-var {
+const bcrypt = require('bcrypt');
+const passport = require('./passportConfig');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const {
     findUserByUsername, createUser, findUserByEmail, 
-    addTokenAndExpire, findTokenAndExpire, updatePassword
+    addTokenAndExpire, findTokenAndExpire, updatePassword,
+    updateUsername, updateEmail, updatePhone, updateAvatar
 } = require('./usersModel');
 
-var getLogin = (req, res) => {
+const getLogin = (req, res) => {
     res.render('login', { title: 'Log in' });
 };
 
-var postLogin = (req, res, next) => {
+const postLogin = (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
-          console.error(err);
-          return res.render('login', { error: 'An unexpected error occurred. Please try again.', title: 'Login' });
+            console.error(err);
+            return res.render('login', { error: 'An unexpected error occurred. Please try again.', title: 'Login' });
         }
         if (!user) {
-          // `info.message` contains the error message set in `passportConfig.js`
-          return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
+            // `info.message` contains the error message set in `passportConfig.js`
+            return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
         }
         if (!user.status) {
-          return res.render('login', { error: 'Your account is inactive. Please contact support.', layout: 'main' });
+            return res.render('login', { error: 'Your account is inactive. Please contact support.', layout: 'main' });
         }
         req.logIn(user, (err) => {
-          if (err) {
-            console.error(err);
-            return res.render('login', { error: 'Failed to log in. Please try again.', title: 'Login' });
-          }
-          return res.redirect('/');
+            if (err) {
+                console.error(err);
+                return res.render('login', { error: 'Failed to log in. Please try again.', title: 'Login' });
+            }
+            return res.redirect('/');
         });
     })(req, res, next);
 };
 
-var getRegister = (req, res) => {
+const getRegister = (req, res) => {
     res.render('register', { title: 'Register' });
 };
 
-var postRegister = async (req, res) => {
-    var { username, email, password, confirmPassword } = req.body;
+const postRegister = async (req, res) => {
+    const { username, email, password, confirmPassword } = req.body;
 
     if (!username || !password || !email || !confirmPassword) {
         return res.render('register', { error: 'All fields are required', title: 'Register' });
     }
 
     try {
-        var existingUser = await findUserByUsername(username);
-        var existingEmail = await findUserByEmail(email);
+        const existingUser = await findUserByUsername(username);
+        const existingEmail = await findUserByEmail(email);
 
         if (existingUser) {
           return res.render('register', { error: 'Username already exists', title: 'Register' });
@@ -61,7 +62,7 @@ var postRegister = async (req, res) => {
           return res.render('register', { error: 'Confirm password must be the same as passwword', title: 'Register' });
         }
 
-        var hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         await createUser(username, email, hashedPassword);
 
         res.render('register', {
@@ -69,12 +70,12 @@ var postRegister = async (req, res) => {
           title: 'Register'
         });
     } catch (error) {
-      console.error(error);
-      res.render('register', { error: 'Something went wrong!', title: 'Register' });
+        console.error(error);
+        res.render('register', { error: 'Something went wrong!', title: 'Register' });
     }
 };
 
-var getForgotPassword = (req, res) => {
+const getForgotPassword = (req, res) => {
     res.render('forgot-password', { title: 'Forgot Password' });
 };
 
@@ -82,7 +83,7 @@ const postForgotPassword = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        res.render('forgot-password', {title: 'Forgot Password', error: "Please enter an email"});
+        return res.render('forgot-password', {title: 'Forgot Password', error: 'Please enter an email'});
     }
 
     try {
@@ -91,7 +92,7 @@ const postForgotPassword = async (req, res) => {
 
         // If user if not found, return error
         if (!user) {
-            res.render('forgot-password', {title: 'Forgot Password', error: "Email is not registered"});
+            return res.render('forgot-password', {title: 'Forgot Password', error: 'Email is not registered'});
         }
 
         // Generate reset-password token
@@ -125,9 +126,9 @@ const postForgotPassword = async (req, res) => {
         // Send email
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                res.render('forgot-password', {title: 'Forgot Password', error: 'Failed to send request email. Please try again later'});
+                return res.render('forgot-password', {title: 'Forgot Password', error: 'Failed to send request email. Please try again later'});
             } else {
-                res.render('forgot-password', {title: 'Forgot Password', success: 'Password reset link has been sent to your email'})
+                return res.render('forgot-password', {title: 'Forgot Password', success: 'Password reset link has been sent to your email'})
             }
         });
     } catch (error) {
@@ -142,7 +143,7 @@ const getResetPassword = async (req, res) => {
     try {
         const user = await findTokenAndExpire(token);
         if (!user) {
-            res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
+            return res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
         }
 
         res.render('reset-password', {title: 'Reset Password', token});
@@ -156,22 +157,22 @@ const postResetPassword = async (req, res) => {
     const { token, password, confirmPassword } = req.body;
 
     if (!password || !confirmPassword || password !== confirmPassword) {
-        res.render('reset-password', {title: 'Reset Password', error: 'Passwords do not match.', token});
+        return res.render('reset-password', {title: 'Reset Password', error: 'Passwords do not match.', token});
     }
 
     try {
         const user = await findTokenAndExpire(token);
         if (!user) {
-            res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
+            return res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
         }
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await updatePassword(user.id, hashedPassword);
 
-        res.render('forgot-password', {title: 'Reset Password', success: 'Password updated successfully. You can now log in.'});
+        return res.render('forgot-password', {title: 'Reset Password', success: 'Password updated successfully. You can now log in.'});
     } catch (error) {
         console.error(error);
-        res.render('reset-password', {title: 'Reset Password', error: 'Something went wrong. Please try again later.', token});
+        return res.render('reset-password', {title: 'Reset Password', error: 'Something went wrong. Please try again later.', token});
     }
 };
 
@@ -193,11 +194,11 @@ function ensureAuthenticated(req, res, next) {
         // Render the error page and pass the error object
         res.status(401).render('error', { error });
     }
-}
+};
 
 const getInfo = (req, res) => {
     res.render('info', { title: 'Information' });
-}
+};
 
 const getLogout = async (req, res, next) => {
     req.logout(err => {
@@ -231,8 +232,121 @@ const checkAvailability = async (req, res) => {
     }
 };
 
+const getAccountInfo = async (req, res) => {
+    const formatCreatedTime = formatDate(req.user.createdAt);
+    return res.render('account-info', {title: 'Account Information', formatCreatedTime});
+};
+
+const getChangePassword = async (req, res) => {
+    res.render('change-password', {title: 'Change Password'});
+};
+
+const postChangePassword = async (req, res) => {
+    const user = await findUserByUsername(req.user.username);
+    const {currentPassword, newPassword, confirmPassword} = req.body;
+
+    try {    
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.render('change-password', {title: 'Change Password', error: 'All fields are required'});
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.render('change-password', {title: 'Change Password', error: 'Current password is incorrect'});
+        }
+
+        if (newPassword !== confirmPassword) {
+            return res.render('change-password', {title: 'Change Password', error: 'Confirm password must be the same as passwword'});
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+        await updatePassword(req.user.id, hashedNewPassword);
+        res.render('change-password', {title: 'Change Password', success: 'Password has been changed'});
+    }
+    catch (error) {
+        console.error(error);
+        res.render('change-password', {title: 'Change Password', error: 'Something went wrong. Please try again later'});
+    }
+};
+
+const getProfileInfo = async (req, res) => {
+    res.render('profile-information', {title: 'Profile information'});
+};
+
+const postChangeInfo = async (req, res) => {
+    const user = await findUserByUsername(req.user.username);
+    const {username, email, phone} = req.body;
+    
+    try {
+        if (username) {
+            const checkUpdateUsername = await updateUsername(user.id, username);
+            if (!checkUpdateUsername) {
+                return res.render('profile-information', {title: 'Profile Information', error: 'Username already exists'});
+            }
+        }
+
+        if (email) {
+            // User are not allowed to update email if user uses Google Login
+            if (req.user.googleId != null) {
+                return res.render('profile-information', {title: 'Profile Information', error: 'Email cannot be updated. You are using your Google account'});
+            }
+            
+            const checkUpdateEmail = await updateEmail(user.id, email);
+            if (!checkUpdateEmail) {
+                return res.render('profile-information', {title: 'Profile Information', error: 'Email already exists'});
+            }
+        }
+
+        if (phone) {
+            await updatePhone(user.id, phone);
+        }
+
+        res.render('profile-information', {title: 'Profile Information', success: 'Your information has been changed'});
+    }
+    catch (error) {
+        console.error(error);
+        res.render('profile-information', {title: 'Profile Information', error: 'Something went wrong. Please try again later'});
+    }
+};
+
+const postProfileImage = async (req, res) => {
+    try {
+        const imageUrl = req.file.path; // Cloudinary URL
+        const userId = req.user.id;
+
+        // Update user profile with the image URL
+        await updateAvatar(userId, imageUrl);
+
+        res.render('profile-information', {
+            success: 'Profile picture updated successfully!',
+            title: 'Profile Information',
+            user: { ...req.user, avatar: imageUrl }, // Update frontend user object
+        });
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        res.render('profile-information', {
+            error: 'Error uploading image. Please try again.',
+            title: 'Profile Information',
+        });
+    }
+};
+
+const formatDate = (date) => {
+    const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+    };
+    return new Intl.DateTimeFormat("en-CA", options).format(new Date(date)).replace(/,/g, "").replace(/:/g, "-");
+};
+
 module.exports = {
     getLogin, postLogin, getRegister, postRegister,
     getInfo, getLogout, ensureAuthenticated, checkAvailability, 
-    getForgotPassword, postForgotPassword, getResetPassword, postResetPassword
+    getForgotPassword, postForgotPassword, getResetPassword, postResetPassword,
+    getAccountInfo, getChangePassword, postChangePassword,
+    getProfileInfo, postChangeInfo, postProfileImage
 };
