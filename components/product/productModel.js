@@ -240,4 +240,26 @@ const getProductsByFilters = async (filters, page = 1, sortOrder = "", pageSize 
     };
 };
 
-module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters };
+// Hàm tìm id_product dựa trên tên sản phẩm
+const getProductIdByName = async (name) => {
+    try {
+        const product = await prisma.product.findUnique({
+            where: {
+                lowercaseName: name, // Lọc theo tên sản phẩm
+            },
+            select: {
+                id: true, // Chỉ lấy cột id
+            },
+        });
+
+        if (!product) {
+            throw new Error('Product not found');
+        }
+
+        return product.id; // Trả về id sản phẩm
+    } catch (err) {
+        throw new Error(err.message);
+    }
+};
+
+module.exports = { getDescriptionByProductName, getRelevantProducts, findProducts, getProductsByFilters, getProductIdByName };
