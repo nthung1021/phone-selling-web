@@ -175,7 +175,10 @@
                 .map((key) => selectedFilters[key].map((value) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join("&"))
                 .join("&");
 
-            let newUrl = `/product/s?name=${nameValue}&${query}&page=${page}&sort=${sortOrder}`;
+            let newUrl = `/product/s?${query}&page=${page}&sort=${sortOrder}`;
+            if (nameValue) {
+                newUrl = `/product/s?name=${nameValue}&${query}&page=${page}&sort=${sortOrder}`;
+            }
             window.history.pushState({ path: newUrl }, "", newUrl);
 
             const url = newUrl.replace('/product/s', '/product/search');
