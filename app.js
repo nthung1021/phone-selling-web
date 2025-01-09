@@ -59,7 +59,7 @@ app.use(session({
     store: prismaStore,
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
         secure: false,
         maxAge: 1000 * 60 * 60 * 24 * 7 // (miliseconds, total: 7 days)
