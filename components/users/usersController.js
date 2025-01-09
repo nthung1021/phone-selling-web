@@ -3,7 +3,7 @@ const passport = require('./passportConfig');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const {
-    findUserByUsername, createUser, findUserByEmail, 
+    findUserByUsername, createUser, findUserByEmail,
     addTokenAndExpire, findTokenAndExpire, updatePassword,
     updateUsername, updateEmail, updatePhone, updateAvatar
 } = require('./usersModel');
@@ -23,7 +23,9 @@ const postLogin = (req, res, next) => {
             return res.render('login', { error: info.message, title: 'Login', username: req.body.username });
         }
         if (!user.status) {
-            return res.render('login', { error: 'Your account is inactive. Please contact support.', layout: 'main' });
+            return res.render('login', {
+                error: 'Your account is inactive. Please contact support.', title: 'Login'
+            });
         }
         req.logIn(user, (err) => {
             if (err) {
@@ -56,23 +58,23 @@ const postRegister = async (req, res) => {
         }
 
         if (existingUser) {
-          return res.render('register', { error: 'Username already exists', title: 'Register' });
+            return res.render('register', { error: 'Username already exists', title: 'Register' });
         }
 
         if (existingEmail) {
-          return res.render('register', { error: 'Email already exists', title: 'Register' });
+            return res.render('register', { error: 'Email already exists', title: 'Register' });
         }
 
         if (password !== confirmPassword) {
-          return res.render('register', { error: 'Confirm password must be the same as passwword', title: 'Register' });
+            return res.render('register', { error: 'Confirm password must be the same as passwword', title: 'Register' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
         await createUser(username, email, hashedPassword);
 
         res.render('register', {
-          success: 'Registration successful! Please log in.',
-          title: 'Register'
+            success: 'Registration successful! Please log in.',
+            title: 'Register'
         });
     } catch (error) {
         console.error(error);
@@ -88,7 +90,7 @@ const postForgotPassword = async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.render('forgot-password', {title: 'Forgot Password', error: 'Please enter an email'});
+        return res.render('forgot-password', { title: 'Forgot Password', error: 'Please enter an email' });
     }
 
     try {
@@ -97,7 +99,7 @@ const postForgotPassword = async (req, res) => {
 
         // If user if not found, return error
         if (!user) {
-            return res.render('forgot-password', {title: 'Forgot Password', error: 'Email is not registered'});
+            return res.render('forgot-password', { title: 'Forgot Password', error: 'Email is not registered' });
         }
 
         // Generate reset-password token
@@ -131,14 +133,14 @@ const postForgotPassword = async (req, res) => {
         // Send email
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                return res.render('forgot-password', {title: 'Forgot Password', error: 'Failed to send request email. Please try again later'});
+                return res.render('forgot-password', { title: 'Forgot Password', error: 'Failed to send request email. Please try again later' });
             } else {
-                return res.render('forgot-password', {title: 'Forgot Password', success: 'Password reset link has been sent to your email'})
+                return res.render('forgot-password', { title: 'Forgot Password', success: 'Password reset link has been sent to your email' })
             }
         });
     } catch (error) {
         console.error(error);
-        res.render('forgot-password', {title: 'Forgot Password', error: 'Something went wrong. Please try again later.'});
+        res.render('forgot-password', { title: 'Forgot Password', error: 'Something went wrong. Please try again later.' });
     }
 };
 
@@ -148,13 +150,13 @@ const getResetPassword = async (req, res) => {
     try {
         const user = await findTokenAndExpire(token);
         if (!user) {
-            return res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
+            return res.render('forgot-password', { title: 'Forgot Password', error: 'Invalid or expired token' });
         }
 
-        res.render('reset-password', {title: 'Reset Password', token});
+        res.render('reset-password', { title: 'Reset Password', token });
     } catch (error) {
         console.error(error);
-        res.render('forgot-password', {title: 'Forgot Password', error: 'Something went wrong. Please try again later'});
+        res.render('forgot-password', { title: 'Forgot Password', error: 'Something went wrong. Please try again later' });
     }
 };
 
@@ -162,32 +164,32 @@ const postResetPassword = async (req, res) => {
     const { token, password, confirmPassword } = req.body;
 
     if (!password || !confirmPassword || password !== confirmPassword) {
-        return res.render('reset-password', {title: 'Reset Password', error: 'Passwords do not match.', token});
+        return res.render('reset-password', { title: 'Reset Password', error: 'Passwords do not match.', token });
     }
 
     const passwordError = validatePassword(password);
     if (passwordError) {
-        return res.render('reset-password', {error: passwordError, title: 'Reset Password'});
+        return res.render('reset-password', { error: passwordError, title: 'Reset Password' });
     }
 
     try {
         const user = await findTokenAndExpire(token);
         if (!user) {
-            return res.render('forgot-password', {title: 'Forgot Password', error: 'Invalid or expired token'});
+            return res.render('forgot-password', { title: 'Forgot Password', error: 'Invalid or expired token' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
 
         await updatePassword(user.id, hashedPassword);
 
-        return res.render('forgot-password', {title: 'Reset Password', success: 'Password updated successfully. You can now log in.'});
+        return res.render('forgot-password', { title: 'Reset Password', success: 'Password updated successfully. You can now log in.' });
     } catch (error) {
         console.error(error);
-        return res.render('reset-password', {title: 'Reset Password', error: 'Something went wrong. Please try again later.', token});
+        return res.render('reset-password', { title: 'Reset Password', error: 'Something went wrong. Please try again later.', token });
     }
 };
 
 const generateResetToken = () => {
-  return crypto.randomBytes(32).toString('hex');
+    return crypto.randomBytes(32).toString('hex');
 };
 
 function ensureAuthenticated(req, res, next) {
@@ -196,9 +198,9 @@ function ensureAuthenticated(req, res, next) {
     } else {
         // Create an error object to pass to the view
         const error = {
-          status: 401,
-          message: 'Unauthorized access. Please log in to continue.',
-          stack: (new Error()).stack // Optional: include stack trace if needed
+            status: 401,
+            message: 'Unauthorized access. Please log in to continue.',
+            stack: (new Error()).stack // Optional: include stack trace if needed
         };
 
         // Render the error page and pass the error object
@@ -212,10 +214,10 @@ const getInfo = (req, res) => {
 
 const getLogout = async (req, res, next) => {
     req.logout(err => {
-      if (err) {
-        return next(err);
-      }
-      res.redirect('/');
+        if (err) {
+            return next(err);
+        }
+        res.redirect('/');
     });
 };
 
@@ -224,15 +226,15 @@ const checkAvailability = async (req, res) => {
 
     try {
         if (username) {
-          const user = await findUserByUsername(username);
-          const userExists = user !== null;
-          return res.json({ exists: userExists });
+            const user = await findUserByUsername(username);
+            const userExists = user !== null;
+            return res.json({ exists: userExists });
         }
 
         if (email) {
-          const user = await findUserByEmail(email);
-          const emailExists = user !== null;
-          return res.json({ exists: emailExists });
+            const user = await findUserByEmail(email);
+            const emailExists = user !== null;
+            return res.json({ exists: emailExists });
         }
 
         res.json({ exists: false });
@@ -244,25 +246,25 @@ const checkAvailability = async (req, res) => {
 
 const getAccountInfo = async (req, res) => {
     const formatCreatedTime = formatDate(req.user.createdAt);
-    return res.render('account-info', {title: 'Account Information', formatCreatedTime});
+    return res.render('account-info', { title: 'Account Information', formatCreatedTime });
 };
 
 const getChangePassword = async (req, res) => {
-    res.render('change-password', {title: 'Change Password'});
+    res.render('change-password', { title: 'Change Password' });
 };
 
 const postChangePassword = async (req, res) => {
     const user = await findUserByUsername(req.user.username);
-    const {currentPassword, newPassword, confirmPassword} = req.body;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
 
-    try {    
+    try {
         if (!currentPassword || !newPassword || !confirmPassword) {
-            return res.render('change-password', {title: 'Change Password', error: 'All fields are required'});
+            return res.render('change-password', { title: 'Change Password', error: 'All fields are required' });
         }
 
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) {
-            return res.render('change-password', {title: 'Change Password', error: 'Current password is incorrect'});
+            return res.render('change-password', { title: 'Change Password', error: 'Current password is incorrect' });
         }
 
         const passwordError = validatePassword(newPassword);
@@ -271,44 +273,44 @@ const postChangePassword = async (req, res) => {
         }
 
         if (newPassword !== confirmPassword) {
-            return res.render('change-password', {title: 'Change Password', error: 'Confirm password must be the same as passwword'});
+            return res.render('change-password', { title: 'Change Password', error: 'Confirm password must be the same as passwword' });
         }
-        
+
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
         await updatePassword(req.user.id, hashedNewPassword);
-        res.render('change-password', {title: 'Change Password', success: 'Password has been changed'});
+        res.render('change-password', { title: 'Change Password', success: 'Password has been changed' });
     }
     catch (error) {
         console.error(error);
-        res.render('change-password', {title: 'Change Password', error: 'Something went wrong. Please try again later'});
+        res.render('change-password', { title: 'Change Password', error: 'Something went wrong. Please try again later' });
     }
 };
 
 const getProfileInfo = async (req, res) => {
-    res.render('profile-information', {title: 'Profile information'});
+    res.render('profile-information', { title: 'Profile information' });
 };
 
 const postChangeInfo = async (req, res) => {
     const user = await findUserByUsername(req.user.username);
-    const {username, email, phone} = req.body;
-    
+    const { username, email, phone } = req.body;
+
     try {
         if (username) {
             const checkUpdateUsername = await updateUsername(user.id, username);
             if (!checkUpdateUsername) {
-                return res.render('profile-information', {title: 'Profile Information', error: 'Username already exists'});
+                return res.render('profile-information', { title: 'Profile Information', error: 'Username already exists' });
             }
         }
 
         if (email) {
             // User are not allowed to update email if user uses Google Login
             if (req.user.googleId != null) {
-                return res.render('profile-information', {title: 'Profile Information', error: 'Email cannot be updated. You are using your Google account'});
+                return res.render('profile-information', { title: 'Profile Information', error: 'Email cannot be updated. You are using your Google account' });
             }
-            
+
             const checkUpdateEmail = await updateEmail(user.id, email);
             if (!checkUpdateEmail) {
-                return res.render('profile-information', {title: 'Profile Information', error: 'Email already exists'});
+                return res.render('profile-information', { title: 'Profile Information', error: 'Email already exists' });
             }
         }
 
@@ -316,11 +318,11 @@ const postChangeInfo = async (req, res) => {
             await updatePhone(user.id, phone);
         }
 
-        res.render('profile-information', {title: 'Profile Information', success: 'Your information has been changed'});
+        res.render('profile-information', { title: 'Profile Information', success: 'Your information has been changed' });
     }
     catch (error) {
         console.error(error);
-        res.render('profile-information', {title: 'Profile Information', error: 'Something went wrong. Please try again later'});
+        res.render('profile-information', { title: 'Profile Information', error: 'Something went wrong. Please try again later' });
     }
 };
 
@@ -382,7 +384,7 @@ const validatePassword = (password) => {
 
 module.exports = {
     getLogin, postLogin, getRegister, postRegister,
-    getInfo, getLogout, ensureAuthenticated, checkAvailability, 
+    getInfo, getLogout, ensureAuthenticated, checkAvailability,
     getForgotPassword, postForgotPassword, getResetPassword, postResetPassword,
     getAccountInfo, getChangePassword, postChangePassword,
     getProfileInfo, postChangeInfo, postProfileImage
