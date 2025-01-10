@@ -1,0 +1,38 @@
+<section class="container mx-auto max-w-[1200px] px-5 py-5 lg:py-10">
+    <!-- review -->
+    <a href={{urlToReturn}} class="mt-4 w-40 bg-violet-900 px-4 py-2 text-white">
+        Return
+    </a>
+        
+    <form action={{urlToPost}} method="POST" class="mb-12 mt-4">
+        <label class="flex" for="review">
+            Your Review
+            <span
+            class="block text-sm font-medium text-slate-700 after:ml-0.5 after:text-red-500 after:content-['*']"
+            ></span> 
+        </label>
+
+        <textarea
+            class="w-full border px-4 py-2 text-gray-500 outline-none"
+            name="review"
+            cols="30"
+            rows="10"
+        >
+        </textarea>
+
+        <button class="mt-4 w-40 bg-violet-900 px-4 py-2 text-white" type="submit">
+            Save
+        </button>
+    </form>
+
+    <h2 class="text-xl bg-violet-400 ">Number reviews of this product- <span>{{numOfReviews}}</span></h2><br>
+    <div id="review-list">
+        {{#each reviews}}
+            <span class="mx-6 text-base font-medium">{{this.username}}</span>
+            <p class="my-4 text-sm">{{this.review}}</p>
+        {{/each}}
+    </div>
+        <!-- review -->
+    <div id="pagination-container" class="flex justify-center items-center mt-4"></div>
+    
+</section>

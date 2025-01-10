@@ -10,7 +10,12 @@ const showProductReview = async(req, res) => {
         const numOfReviews = await getNumberOfReviewByProduct(id_product) // get number of reviews
         const reviews = await getReviewByProduct(id_product, currentPage) // get reviews
 
-        res.json({ reviews: reviews, numOfReviews: numOfReviews })
+        const currentUrl = req.originalUrl;
+        const urlToPost = `${currentUrl}/post`;
+        const urlToReturn = currentUrl.replace(/\/review$/, "");
+
+        res.render('review', { reviews: reviews, numOfReviews: numOfReviews, urlToPost: urlToPost, urlToReturn: urlToReturn
+        })
     } catch(err) {
         console.error("Error in getReview:", err);
         res.status(500).send("Error retrieving reviews");
